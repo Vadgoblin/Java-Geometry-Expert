@@ -3740,13 +3740,18 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.pack();
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int frameWidth = 1000;
-        int frameHeight = 700;
-        frame.setSize(frameWidth, frameHeight);
+        if(isRunningInCheerpJ()) {
+            frame.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+        }else{
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int frameWidth = 1000;
+            int frameHeight = 700;
+            frame.setSize(frameWidth, frameHeight);
 
-        frame.setLocation((int) (screenSize.getWidth() - frameWidth) / 2,
-                (int) (screenSize.getHeight() - frameHeight) / 2); //center
+            frame.setLocation((int) (screenSize.getWidth() - frameWidth) / 2,
+                    (int) (screenSize.getHeight() - frameHeight) / 2); //center
+        }
+
         frame.setVisible(true);
 
         // In case there were command line requests, let us do them:
