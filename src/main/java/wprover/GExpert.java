@@ -39,6 +39,21 @@ import java.util.jar.JarInputStream;
 
 import org.apache.commons.cli.*;
 
+
+class NativeFileBridge {
+
+    public static native void showOpenDialog();
+
+    public static void onFileLoaded(String virtualPath) {
+        System.out.println("Opening file in JGEX: " + virtualPath);
+        File file = new File(virtualPath);
+
+        javax.swing.SwingUtilities.invokeLater(() -> {
+            // e.g., GExpert.getInstance().openFile(file);
+        });
+    }
+}
+
 /**
  * GExpert is the main class for the GEXPERT application.
  * It initializes the application, sets up the GUI, and handles user interactions.
@@ -1824,15 +1839,25 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             if (src instanceof File) {
                 openAFile((File) src);
             } else {
+                if(isRunningInCheerpJ()){
+                    try{
+                        System.out.println(NativeFileBridge.class.getName());
+                        NativeFileBridge.showOpenDialog();
+                    }
+                    catch(Exception ex){
+                        System.err.println("RIP!");
+                    }
+                }else{
+                    JFileChooser chooser = getFileChooser(false);
 
-                JFileChooser chooser = getFileChooser(false);
-                int result = chooser.showOpenDialog(this);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    try {
-                        File file = chooser.getSelectedFile();
-                        openAFile(file);
-                    } catch (Exception ee) {
-                        ee.printStackTrace();
+                    int result = chooser.showOpenDialog(this);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            File file = chooser.getSelectedFile();
+                            openAFile(file);
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
+                        }
                     }
                 }
             }
