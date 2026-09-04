@@ -40,6 +40,7 @@ import java.util.jar.JarInputStream;
 import org.apache.commons.cli.*;
 import wprover.CheerpJIntegration.CheerpJIntegration;
 import wprover.CheerpJIntegration.WebOpenFileDialog;
+import wprover.CheerpJIntegration.WebSaveFileDialog;
 
 
 /**
@@ -820,6 +821,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Populate a JMenu by scanning a folder on the classpath.
+     *
      * @param menu        the menu to fill
      * @param resourceDir the resource path (e.g. "docs/examples")
      */
@@ -858,8 +860,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                             // If one name starts with a number and the other doesn't, prioritize the one with number
                             else if (name1.matches("^\\d+.*")) {
                                 return -1;
-                            }
-                            else if (name2.matches("^\\d+.*")) {
+                            } else if (name2.matches("^\\d+.*")) {
                                 return 1;
                             }
 
@@ -874,10 +875,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 for (File f : files) {
                     handleEntry(menu, resourceDir, f.getName(), f.isDirectory());
                 }
-            if (files.length > 0) {
-                // we assume that at least one file was found
-                return; // so no further work is needed
-            }
+                if (files.length > 0) {
+                    // we assume that at least one file was found
+                    return; // so no further work is needed
+                }
             } catch (Exception ex) {
                 // Problem when getting URL.
             }
@@ -887,116 +888,114 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             try {
                 // Use JarFile approach to get all entries
                 try {
-                        URL jarUrl = cl.getResource(path);
-                        if (jarUrl != null) {
-                            String jarPath = jarUrl.toString();
-                            if (jarPath.startsWith("jar:file:")) {
-                                jarPath = jarPath.substring(9, jarPath.indexOf("!"));
-                                jarPath = jarPath.replace("%20", " "); // fix path
-                                try (JarFile jar = new JarFile(jarPath)) {
-                                    Enumeration<JarEntry> entries = jar.entries();
-                                    // first collect all entries to process
-                                    java.util.Map<String, Boolean> processedDirs = new java.util.HashMap<>();
-                                    java.util.List<String> filesToProcess = new java.util.ArrayList<String>();
+                    URL jarUrl = cl.getResource(path);
+                    if (jarUrl != null) {
+                        String jarPath = jarUrl.toString();
+                        if (jarPath.startsWith("jar:file:")) {
+                            jarPath = jarPath.substring(9, jarPath.indexOf("!"));
+                            jarPath = jarPath.replace("%20", " "); // fix path
+                            try (JarFile jar = new JarFile(jarPath)) {
+                                Enumeration<JarEntry> entries = jar.entries();
+                                // first collect all entries to process
+                                java.util.Map<String, Boolean> processedDirs = new java.util.HashMap<>();
+                                java.util.List<String> filesToProcess = new java.util.ArrayList<String>();
 
-                                    while (entries.hasMoreElements()) {
-                                        JarEntry entry = entries.nextElement();
-                                        String entryName = entry.getName();
+                                while (entries.hasMoreElements()) {
+                                    JarEntry entry = entries.nextElement();
+                                    String entryName = entry.getName();
 
-                                        if (entryName.startsWith(path)) {
-                                            String relativePath = entryName.substring(path.length());
-                                            if (relativePath.isEmpty()) continue;
+                                    if (entryName.startsWith(path)) {
+                                        String relativePath = entryName.substring(path.length());
+                                        if (relativePath.isEmpty()) continue;
 
-                                            int slashIndex = relativePath.indexOf('/');
-                                            if (slashIndex == -1) {
-                                                filesToProcess.add(relativePath);
-                                            } else {
-                                                // subdirectory
-                                                String dirName = relativePath.substring(0, slashIndex);
-                                                if (!processedDirs.containsKey(dirName)) {
-                                                    processedDirs.put(dirName, true);
-                                                }
+                                        int slashIndex = relativePath.indexOf('/');
+                                        if (slashIndex == -1) {
+                                            filesToProcess.add(relativePath);
+                                        } else {
+                                            // subdirectory
+                                            String dirName = relativePath.substring(0, slashIndex);
+                                            if (!processedDirs.containsKey(dirName)) {
+                                                processedDirs.put(dirName, true);
                                             }
                                         }
-                                    }
-
-                                    // Sort directories using custom comparator
-                                    java.util.List<String> dirNames = new java.util.ArrayList<>(processedDirs.keySet());
-                                    Collections.sort(dirNames, new Comparator<String>() {
-                                        @Override
-                                        public int compare(String name1, String name2) {
-                                            // Check if both names start with numbers
-                                            if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
-                                                // Extract the numeric prefix
-                                                String num1 = name1.replaceAll("^(\\d+).*", "$1");
-                                                String num2 = name2.replaceAll("^(\\d+).*", "$1");
-
-                                                // If numeric parts are different, compare them numerically
-                                                if (!num1.equals(num2)) {
-                                                    return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
-                                                }
-                                            }
-                                            // If one name starts with a number and the other doesn't, prioritize the one with number
-                                            else if (name1.matches("^\\d+.*")) {
-                                                return -1;
-                                            }
-                                            else if (name2.matches("^\\d+.*")) {
-                                                return 1;
-                                            }
-
-                                            // Otherwise, use alphabetical order
-                                            return name1.compareTo(name2);
-                                        }
-                                    });
-
-                                    // Process directories in sorted order
-                                    for (String dirName : dirNames) {
-                                        handleEntry(menu, resourceDir, dirName, true);
-                                    }
-
-                                    // Sort files using custom comparator
-                                    Collections.sort(filesToProcess, new Comparator<String>() {
-                                        @Override
-                                        public int compare(String name1, String name2) {
-                                            // Check if both names start with numbers
-                                            if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
-                                                // Extract the numeric prefix
-                                                String num1 = name1.replaceAll("^(\\d+).*", "$1");
-                                                String num2 = name2.replaceAll("^(\\d+).*", "$1");
-
-                                                // If numeric parts are different, compare them numerically
-                                                if (!num1.equals(num2)) {
-                                                    return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
-                                                }
-                                            }
-                                            // If one name starts with a number and the other doesn't, prioritize the one with number
-                                            else if (name1.matches("^\\d+.*")) {
-                                                return -1;
-                                            }
-                                            else if (name2.matches("^\\d+.*")) {
-                                                return 1;
-                                            }
-
-                                            // Otherwise, use alphabetical order
-                                            return name1.compareTo(name2);
-                                        }
-                                    });
-
-                                    // process all files in this directory
-                                    for (String fileName : filesToProcess) {
-                                        handleEntry(menu, resourceDir, fileName, false);
                                     }
                                 }
+
+                                // Sort directories using custom comparator
+                                java.util.List<String> dirNames = new java.util.ArrayList<>(processedDirs.keySet());
+                                Collections.sort(dirNames, new Comparator<String>() {
+                                    @Override
+                                    public int compare(String name1, String name2) {
+                                        // Check if both names start with numbers
+                                        if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
+                                            // Extract the numeric prefix
+                                            String num1 = name1.replaceAll("^(\\d+).*", "$1");
+                                            String num2 = name2.replaceAll("^(\\d+).*", "$1");
+
+                                            // If numeric parts are different, compare them numerically
+                                            if (!num1.equals(num2)) {
+                                                return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
+                                            }
+                                        }
+                                        // If one name starts with a number and the other doesn't, prioritize the one with number
+                                        else if (name1.matches("^\\d+.*")) {
+                                            return -1;
+                                        } else if (name2.matches("^\\d+.*")) {
+                                            return 1;
+                                        }
+
+                                        // Otherwise, use alphabetical order
+                                        return name1.compareTo(name2);
+                                    }
+                                });
+
+                                // Process directories in sorted order
+                                for (String dirName : dirNames) {
+                                    handleEntry(menu, resourceDir, dirName, true);
+                                }
+
+                                // Sort files using custom comparator
+                                Collections.sort(filesToProcess, new Comparator<String>() {
+                                    @Override
+                                    public int compare(String name1, String name2) {
+                                        // Check if both names start with numbers
+                                        if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
+                                            // Extract the numeric prefix
+                                            String num1 = name1.replaceAll("^(\\d+).*", "$1");
+                                            String num2 = name2.replaceAll("^(\\d+).*", "$1");
+
+                                            // If numeric parts are different, compare them numerically
+                                            if (!num1.equals(num2)) {
+                                                return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
+                                            }
+                                        }
+                                        // If one name starts with a number and the other doesn't, prioritize the one with number
+                                        else if (name1.matches("^\\d+.*")) {
+                                            return -1;
+                                        } else if (name2.matches("^\\d+.*")) {
+                                            return 1;
+                                        }
+
+                                        // Otherwise, use alphabetical order
+                                        return name1.compareTo(name2);
+                                    }
+                                });
+
+                                // process all files in this directory
+                                for (String fileName : filesToProcess) {
+                                    handleEntry(menu, resourceDir, fileName, false);
+                                }
                             }
-                            return; // success
                         }
+                        return; // success
+                    }
 
                 } catch (Exception ex) {
                     // Error with file handling.
                 }
                 // 3. fallback to JarInputStream if jar-file protocol not available
                 try (InputStream is = cl.getResourceAsStream(path);
-                    JarInputStream jin = new JarInputStream(is)) {
+                     JarInputStream jin = new JarInputStream(is)) {
                     JarEntry e;
                     while ((e = jin.getNextJarEntry()) != null) {
                         String name = e.getName();
@@ -1038,7 +1037,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Adds the contents of the specified directory to the specified menu.
      *
-     * @param f the directory whose contents will be added
+     * @param f    the directory whose contents will be added
      * @param menu the menu to which the contents will be added
      * @param path the path of the directory
      */
@@ -1070,8 +1069,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                         // If one name starts with a number and the other doesn't, prioritize the one with number
                         else if (name1.matches("^\\d+.*")) {
                             return -1;
-                        }
-                        else if (name2.matches("^\\d+.*")) {
+                        } else if (name2.matches("^\\d+.*")) {
                             return 1;
                         }
 
@@ -1414,11 +1412,11 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a JRadioButtonMenuItem with the specified name, tooltip, action listener, and command.
      *
-     * @param bar the menu to add the item to
-     * @param name the display name and action command of the menu item
-     * @param tooltip the tooltip text to display
+     * @param bar      the menu to add the item to
+     * @param name     the display name and action command of the menu item
+     * @param tooltip  the tooltip text to display
      * @param listener the action listener to register on the menu item
-     * @param command the specific action command to set
+     * @param command  the specific action command to set
      * @return the created JRadioButtonMenuItem
      */
     public JRadioButtonMenuItem addRadioButtonMenuItem(JMenu bar, String name,
@@ -1432,10 +1430,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * Creates a JRadioButtonMenuItem with the specified name, custom text, tooltip, and action listener.
      * The menu item's text is set to its localized value.
      *
-     * @param bar the menu to add the item to
-     * @param name the internal name of the menu item used as its action command
-     * @param text the text to display on the menu item (to be localized)
-     * @param tooltip the tooltip text to display
+     * @param bar      the menu to add the item to
+     * @param name     the internal name of the menu item used as its action command
+     * @param text     the text to display on the menu item (to be localized)
+     * @param tooltip  the tooltip text to display
      * @param listener the action listener to register on the menu item
      * @return the created JRadioButtonMenuItem with localized text
      */
@@ -1451,9 +1449,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * The menu item's text and action command are set based on the provided name.
      * If the tooltip is null, a localized language tip may be used instead.
      *
-     * @param bar the menu to add the item to
-     * @param name the name used as the action command and display text of the menu item
-     * @param tooltip the tooltip text to display (or a localized tip if null)
+     * @param bar      the menu to add the item to
+     * @param name     the name used as the action command and display text of the menu item
+     * @param tooltip  the tooltip text to display (or a localized tip if null)
      * @param listener the action listener to register on the menu item
      * @return the created JRadioButtonMenuItem
      */
@@ -1481,10 +1479,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Adds a menu item to the specified menu bar with the given name, tooltip, mnemonic, and action listener.
      *
-     * @param bar the menu bar to which the menu item will be added
-     * @param name the name of the menu item
-     * @param tooltip the tooltip text for the menu item
-     * @param ne the mnemonic for the menu item
+     * @param bar      the menu bar to which the menu item will be added
+     * @param name     the name of the menu item
+     * @param tooltip  the tooltip text for the menu item
+     * @param ne       the mnemonic for the menu item
      * @param listener the action listener for the menu item
      * @return the created JMenuItem
      */
@@ -1532,9 +1530,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Adds a menu item to the specified menu bar with the given name, tooltip, and action listener.
      *
-     * @param bar the menu bar to which the menu item will be added
-     * @param name the name of the menu item
-     * @param tooltip the tooltip text for the menu item
+     * @param bar      the menu bar to which the menu item will be added
+     * @param name     the name of the menu item
+     * @param tooltip  the tooltip text for the menu item
      * @param listener the action listener for the menu item
      * @return the created JMenuItem
      */
@@ -1677,7 +1675,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * updating the UI state, and other application-specific functions.
      *
      * @param command the action command to be processed
-     * @param src the source object that triggered the command (e.g., JMenuItem, JToggleButton, or File)
+     * @param src     the source object that triggered the command (e.g., JMenuItem, JToggleButton, or File)
      */
     synchronized public void sendAction(String command, Object src) {
 
@@ -1833,7 +1831,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             if (src instanceof File) {
                 openAFile((File) src);
             } else {
-                if(CheerpJIntegration.isRunningInCheerpJ()){
+                if (CheerpJIntegration.isRunningInCheerpJ()) {
                     WebOpenFileDialog chooser = new WebOpenFileDialog();
 
                     int result = chooser.showOpenDialog(this, new String[]{".gex"});
@@ -1845,7 +1843,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                             ee.printStackTrace();
                         }
                     }
-                }else{
+                } else {
                     JFileChooser chooser = getFileChooser(false);
 
                     int result = chooser.showOpenDialog(this);
@@ -1864,7 +1862,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             if (src instanceof File) {
                 openGGBFile((File) src);
             } else {
-                if(CheerpJIntegration.isRunningInCheerpJ()){
+                if (CheerpJIntegration.isRunningInCheerpJ()) {
                     WebOpenFileDialog chooser = new WebOpenFileDialog();
 
                     int result = chooser.showOpenDialog(this, new String[]{".ggb"});
@@ -1876,8 +1874,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                             ee.printStackTrace();
                         }
                     }
-                }
-                else {
+                } else {
                     JFileChooser chooser = getFileChooser(true);
                     int result = chooser.showOpenDialog(this);
                     if (result == JFileChooser.APPROVE_OPTION) {
@@ -2256,6 +2253,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * Show a warning on saving file in an unsafe folder that will be removed after closing JGEX.
      * In a Flathub sandbox, this is an important message for the user because the OS
      * does not inform the user on saving a file in a temporary folder.
+     *
      * @param file The user wants to use as the saved file.
      */
     private void showWarningUnsafeFolder(File file) {
@@ -2462,50 +2460,59 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * @return true if the file was saved successfully, false otherwise
      */
     public boolean saveAFile(boolean n) {
-        File file = dp.getFile();
-        int result = 0;
-
-        if (need_save()) {
-            if (file == null || n) { // command.equals("Save as...")
-                JFileChooser chooser = this.getFileChooser(false);
-
-                try {
-                    if (file != null && file.exists())
-                        chooser.setSelectedFile(file);
-                    result = chooser.showSaveDialog(this);
-                } catch (Exception ee) {
-                    filechooser = null;
-                    chooser = this.getFileChooser(false);
-                    result = chooser.showSaveDialog(this);
-                }
-
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    file = chooser.getSelectedFile();
-                } else
-                    file = null;
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            try {
+                saveAFile("/str/unnamed.gex");
+            } catch (IOException e) {
+                System.err.println("Failed to save file for web download. " + e.toString());
             }
-            if (file != null)
-                try {
-                    showWarningUnsafeFolder(file);
-                    String path = file.getPath();
-                    if (!path.endsWith(".gex")) {
-                        path += ".gex";
-                    }
-                    File f = new File(path);
-                    if (f.exists() && get_User_Overwrite_Option(file.getName())) {
-                        return false;
-                    }
-                    saveAFile(path);
-                    updateTitle();
-                    CMisc.onFileSavedOrLoaded();
-                    return true;
+            return true;
+        } else {
+            File file = dp.getFile();
+            int result = 0;
 
-                } catch (Exception ee) {
-                    ee.printStackTrace();
-                    CMisc.print(ee.getMessage() + "\n" + ee.getStackTrace());
+            if (need_save()) {
+                if (file == null || n) { // command.equals("Save as...")
+                    JFileChooser chooser = this.getFileChooser(false);
+
+                    try {
+                        if (file != null && file.exists())
+                            chooser.setSelectedFile(file);
+                        result = chooser.showSaveDialog(this);
+                    } catch (Exception ee) {
+                        filechooser = null;
+                        chooser = this.getFileChooser(false);
+                        result = chooser.showSaveDialog(this);
+                    }
+
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        file = chooser.getSelectedFile();
+                    } else
+                        file = null;
                 }
+                if (file != null)
+                    try {
+                        showWarningUnsafeFolder(file);
+                        String path = file.getPath();
+                        if (!path.endsWith(".gex")) {
+                            path += ".gex";
+                        }
+                        File f = new File(path);
+                        if (f.exists() && get_User_Overwrite_Option(file.getName())) {
+                            return false;
+                        }
+                        saveAFile(path);
+                        updateTitle();
+                        CMisc.onFileSavedOrLoaded();
+                        return true;
+
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                        CMisc.print(ee.getMessage() + "\n" + ee.getStackTrace());
+                    }
+            }
+            return false;
         }
-        return false;
     }
 
     /**
@@ -2608,10 +2615,20 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * @throws IOException if an I/O error occurs during saving
      */
     public void saveAFile(String path) throws IOException {
-        DataOutputStream out = dp.openOutputFile(path);
-        dp.Save(out);
-        pprove.SaveProve(out);
-        out.close();
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            DataOutputStream out = dp.openOutputFile("/files/unnamed.gex");
+            dp.Save(out);
+            pprove.SaveProve(out);
+            out.close();
+
+            WebSaveFileDialog wsf = new WebSaveFileDialog();
+            wsf.showSaveDialog(this, "/files/unnamed.gex", "unnamed.gex");
+        } else {
+            DataOutputStream out = dp.openOutputFile(path);
+            dp.Save(out);
+            pprove.SaveProve(out);
+            out.close();
+        }
     }
 
     /**
@@ -2980,7 +2997,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Opens and loads a project file from a resource path.
-     * 
+     *
      * @param resourcePath the path of the resource to open
      * @return true if the file was successfully loaded, false otherwise
      */
@@ -3275,11 +3292,11 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a toggle button with the specified image, action command, tooltip text, alternate text, and an optional action listener.
      *
-     * @param imageName the name of the image file (without extension) to be used as the button icon
+     * @param imageName     the name of the image file (without extension) to be used as the button icon
      * @param actionCommand the action command to be set for the button
-     * @param toolTipText the tooltip text to be displayed when the mouse hovers over the button
-     * @param altText the alternate text to be used if the image cannot be found
-     * @param t a boolean indicating whether to add an action listener to the button
+     * @param toolTipText   the tooltip text to be displayed when the mouse hovers over the button
+     * @param altText       the alternate text to be used if the image cannot be found
+     * @param t             a boolean indicating whether to add an action listener to the button
      * @return the created JToggleButton
      */
     protected JToggleButton makeAButton(String imageName,
@@ -3297,10 +3314,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a toggle button with the specified image, action command, tooltip text, and alternate text.
      *
-     * @param imageName the name of the image file (without extension) to be used as the button icon
+     * @param imageName     the name of the image file (without extension) to be used as the button icon
      * @param actionCommand the action command to be set for the button
-     * @param toolTipText the tooltip text to be displayed when the mouse hovers over the button
-     * @param altText the alternate text to be used if the image cannot be found
+     * @param toolTipText   the tooltip text to be displayed when the mouse hovers over the button
+     * @param altText       the alternate text to be used if the image cannot be found
      * @return the created JToggleButton
      */
     protected JToggleButton makeAButton(String imageName,
@@ -3347,11 +3364,11 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a toggle button with two icons, one for the default state and one for the selected state.
      *
-     * @param imageName the name of the image file (without extension) to be used as the button icon in the default state
+     * @param imageName         the name of the image file (without extension) to be used as the button icon in the default state
      * @param imageNameSelected the name of the image file (without extension) to be used as the button icon in the selected state
-     * @param actionCommand the action command to be set for the button
-     * @param toolTipText the tooltip text to be displayed when the mouse hovers over the button
-     * @param altText the alternate text to be used if the image cannot be found
+     * @param actionCommand     the action command to be set for the button
+     * @param toolTipText       the tooltip text to be displayed when the mouse hovers over the button
+     * @param altText           the alternate text to be used if the image cannot be found
      * @return the created DActionButton with two status icons
      */
     protected JToggleButton makeAButtonWith2ICon(String imageName,
@@ -3745,6 +3762,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Create an ImageIcon from the path.
+     *
      * @param path the path to the image
      * @return the ImageIcon
      */
@@ -3758,6 +3776,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Get the resource URL from the path.
+     *
      * @param path the path to the resource
      * @return the URL of the resource
      */
@@ -3778,9 +3797,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.pack();
 
-        if(CheerpJIntegration.isRunningInCheerpJ()) {
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
             frame.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
-        }else{
+        } else {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
             int frameWidth = 1000;
             int frameHeight = 700;
@@ -3929,6 +3948,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     // TODO START CONVERTING HERE, this is the main method
+
     /**
      * Main entry point of the application.
      * Processes command line options and initializes the GUI.
@@ -3978,8 +3998,8 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 Runtime.getRuntime().exec(command);
             } catch (Exception e) {
                 // fallback to showing a message with the URL if JavaScript bridge fails
-                JOptionPane.showMessageDialog(null, 
-                    GExpert.getTranslationViaGettext("Please open this URL in your browser: {0}", url));
+                JOptionPane.showMessageDialog(null,
+                        GExpert.getTranslationViaGettext("Please open this URL in your browser: {0}", url));
             }
         } else {
             // original desktop behavior
