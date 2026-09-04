@@ -1719,14 +1719,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             this.prove((String)src);
         } else if (command.equalsIgnoreCase("Wait")) {
             this.wait(src);
-        } else if (command.equals("Save") || command.equals("Save as...")) {
-            if (command.equals("Save")) {
-                if (src instanceof File) {
-                    dp.setFile((File) src);
-                }
-                this.saveAFile(false);
-            } else this.saveAFile(true);
-
+        } else if (command.equals("Save")) {
+            this.save(src);
+        } else if (command.equals("Save as...")) {
+            this.saveAs();
         } else if (command.equalsIgnoreCase("Save GDD Proof as GraphViz File")) {
             this.saveGDDProofAsGraphViz(src);
         } else if (command.equalsIgnoreCase("Open GDD Proof in GraphViz Online")) {
@@ -2900,6 +2896,17 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } catch (Exception e) {
             // Dummy placeholder
         }
+    }
+
+    private void save(Object src){
+        if (src instanceof File) {
+            dp.setFile((File) src);
+        }
+        this.saveAFile(false);
+    }
+
+    private void saveAs(){
+        this.saveAFile(true);
     }
 
     /**
