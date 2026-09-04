@@ -46,11 +46,11 @@ class NativeFileBridge {
 
     public static void onFileLoaded(String virtualPath) {
         System.out.println("Opening file in JGEX: " + virtualPath);
-        File file = new File(virtualPath);
-
-        javax.swing.SwingUtilities.invokeLater(() -> {
-            // e.g., GExpert.getInstance().openFile(file);
-        });
+//        File file = new File(virtualPath);
+//
+//        javax.swing.SwingUtilities.invokeLater(() -> {
+//            // e.g., GExpert.getInstance().openFile(file);
+//        });
     }
 }
 
@@ -1839,13 +1839,13 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             if (src instanceof File) {
                 openAFile((File) src);
             } else {
-                if(isRunningInCheerpJ()){
+                if(CheerpJIntegration.isRunningInCheerpJ()){
                     try{
                         System.out.println(NativeFileBridge.class.getName());
                         NativeFileBridge.showOpenDialog();
                     }
                     catch(Exception ex){
-                        System.err.println("RIP!");
+                        System.err.println("RIP! ex: "+ ex.toString());
                     }
                 }else{
                     JFileChooser chooser = getFileChooser(false);
@@ -3765,7 +3765,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.pack();
 
-        if(isRunningInCheerpJ()) {
+        if(CheerpJIntegration.isRunningInCheerpJ()) {
             frame.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
         }else{
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -3934,34 +3934,6 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     /**
-     * Checks if the application is running in a JAR file (including CheerpJ web environment).
-     *
-     * @return true if running from a JAR file, false otherwise.
-     */
-    public static boolean isRunningFromJar() {
-        URL resource = GExpert.class.getResource("/wprover/GExpert.class");
-        return resource != null && resource.toString().startsWith("jar:");
-    }
-
-    /**
-     * Checks if the application is running in a CheerpJ web environment.
-     * 
-     * @return true if likely running in CheerpJ, false otherwise.
-     */
-    public static boolean isRunningInCheerpJ() {
-        // check if running in a browser environment (CheerpJ)
-        try {
-            // cheerpJ sets this property
-            return System.getProperty("java.vm.name", "").contains("CheerpJ") || 
-                   // alternative detection method
-                   (isRunningFromJar() && System.getProperty("browser", "false").equals("true"));
-        } catch (Exception e) {
-            // if we can't determine, assume not in CheerpJ
-            return false;
-        }
-    }
-
-    /**
      * Opens the specified URL in the system's default web browser or handles it appropriately
      * for the current environment (desktop or web/CheerpJ).
      *
@@ -3969,7 +3941,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      */
     public static void openURL(String url) {
         // check if we're running in CheerpJ/web environment
-        if (isRunningInCheerpJ()) {
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
             try {
                 // for file:/// URLs in CheerpJ, we need to handle them differently
                 if (url.startsWith("file:///")) {
