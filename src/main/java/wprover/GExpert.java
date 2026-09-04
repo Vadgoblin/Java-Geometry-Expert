@@ -1716,17 +1716,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } else if (command.equalsIgnoreCase("Save Proof as Animated Image")) {
             this.saveProofAsGIF();
         } else if (command.equalsIgnoreCase("Prove")) {
-            if (((String) src).equalsIgnoreCase("gdd")) {
-                pprove.proveGdd(); // TODO: Add more provers
-                // Workaround: certain imported GGB conclusions may need
-                // a re-computation. FIXME
-                if (GExpert.conclusion != null)
-                    pprove.proveGdd();
-                GExpert.performCommandLineRequests(this, true);
-
-            } else {
-                pprove.prove();
-            }
+            this.prove((String)src);
         } else if (command.equalsIgnoreCase("Wait")) {
             Integer secs = (Integer) src;
             try {
@@ -2892,6 +2882,21 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             }
         }
 
+    }
+
+
+    private void prove(String src){
+        if (src.equalsIgnoreCase("gdd")) {
+            pprove.proveGdd(); // TODO: Add more provers
+            // Workaround: certain imported GGB conclusions may need
+            // a re-computation. FIXME
+            if (GExpert.conclusion != null)
+                pprove.proveGdd();
+            GExpert.performCommandLineRequests(this, true);
+
+        } else {
+            pprove.prove();
+        }
     }
 
     /**
