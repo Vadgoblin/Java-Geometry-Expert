@@ -2217,9 +2217,39 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         }
     }
 
-    private void saveAsText(){
+    private void saveAsText() {
         GTerm gt = pprove.getConstructionTerm();
-        if (gt != null) {
+        if (gt == null) {
+            return;
+        }
+
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
+
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".txt";
+            }
+
+            String filePath = "/files/" + fileName;
+
+            try {
+                FileOutputStream fp = new FileOutputStream(filePath, false);
+                fp.write("\n\n".getBytes());
+                gt.writeAterm(fp);
+                dp.writePointPosition(fp);
+                fp.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            } catch (IOException ee) {
+                JOptionPane.showMessageDialog(this, ee.getMessage(),
+                        "Failed to save as text: ", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
             JFileChooser filechooser1 = new JFileChooser();
             String dr = getUserDir();
             filechooser1.setCurrentDirectory(new File(dr));
