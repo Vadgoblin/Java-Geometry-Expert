@@ -3588,6 +3588,20 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     public void windowOpened(WindowEvent e) {
+        boolean DISPLAY_EXECUTION_ENVIORNMENT_ON_STARTUP = true;
+
+        if(DISPLAY_EXECUTION_ENVIORNMENT_ON_STARTUP){
+            displayExecutionenviornment();
+        }
+    }
+
+    private void displayExecutionenviornment(){
+        String env = CheerpJIntegration.isRunningInCheerpJ()
+                ? "CheerpJ WebAssembly (Browser)"
+                : "Native JVM (" + System.getProperty("java.version") + ")";
+
+        EnvironmentDialog dialog = new EnvironmentDialog(GExpert.this, env);
+        dialog.showCentered();
     }
 
     /**
