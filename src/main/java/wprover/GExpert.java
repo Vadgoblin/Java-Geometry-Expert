@@ -2462,7 +2462,12 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     public boolean saveAFile(boolean n) {
         if (CheerpJIntegration.isRunningInCheerpJ()) {
             try {
-                saveAFileCheerpJ("/str/unnamed.gex");
+                String fileName = dp.getName();
+                if(fileName == null || fileName.strip().isEmpty()){
+                    fileName = "unnamed.gex";
+                }
+
+                saveAFileCheerpJ(fileName);
             } catch (IOException e) {
                 System.err.println("Failed to save file for web download. " + e.toString());
             }
@@ -2621,14 +2626,19 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         out.close();
     }
 
-    public void saveAFileCheerpJ(String path) throws IOException {
-        DataOutputStream out = dp.openOutputFile("/files/unnamed.gex");
+    public void saveAFileCheerpJ(String fileName) throws IOException {
+        if(!fileName.endsWith(".gex")){
+            fileName+=".gex";
+        }
+        String filePath = "/files/"+fileName;
+
+        DataOutputStream out = dp.openOutputFile(filePath);
         dp.Save(out);
         pprove.SaveProve(out);
         out.close();
 
         WebSaveFileDialog wsf = new WebSaveFileDialog();
-        wsf.showSaveDialog(this, "/files/unnamed.gex", "unnamed.gex");
+        wsf.showSaveDialog(this, filePath, fileName);
     }
 
     /**
