@@ -1718,13 +1718,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } else if (command.equalsIgnoreCase("Prove")) {
             this.prove((String)src);
         } else if (command.equalsIgnoreCase("Wait")) {
-            Integer secs = (Integer) src;
-            try {
-                wait(secs * 1000);
-            } catch (Exception e) {
-                // Dummy placeholder
-            }
-
+            this.wait(src);
         } else if (command.equals("Save") || command.equals("Save as...")) {
             if (command.equals("Save")) {
                 if (src instanceof File) {
@@ -2896,6 +2890,15 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
         } else {
             pprove.prove();
+        }
+    }
+
+    private void wait(Object src){
+        Integer secs = (Integer) src;
+        try {
+            wait(secs * 1000);
+        } catch (Exception e) {
+            // Dummy placeholder
         }
     }
 
