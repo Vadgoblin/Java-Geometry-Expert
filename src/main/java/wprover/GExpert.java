@@ -117,6 +117,12 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * It also initializes various attributes and sets up the main content pane.
      */
     public void init() {
+        String env = CheerpJIntegration.isRunningInCheerpJ()
+                ? "CheerpJ WebAssembly (Browser)"
+                : "Native JVM (" + System.getProperty("java.version") + ")";
+        System.out.println("Running in: " + env);
+
+
         this.setIconImage(GExpert.createImageIcon("images/gexicon.gif").getImage());    //GAPPLET
         // setLocal();
         // showWelcome();
@@ -162,8 +168,6 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         addWindowListener(this);
 
         this.getContentPane().add(contentPane, BorderLayout.CENTER);
-
-        System.out.println("WebFileChooser classname: "+WebFileChooser.class.getName());
     }
 
     /**
@@ -3582,20 +3586,6 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     public void windowOpened(WindowEvent e) {
-        boolean DISPLAY_EXECUTION_ENVIORNMENT_ON_STARTUP = true;
-
-        if(DISPLAY_EXECUTION_ENVIORNMENT_ON_STARTUP){
-            displayExecutionenviornment();
-        }
-    }
-
-    private void displayExecutionenviornment(){
-        String env = CheerpJIntegration.isRunningInCheerpJ()
-                ? "CheerpJ WebAssembly (Browser)"
-                : "Native JVM (" + System.getProperty("java.version") + ")";
-
-        EnvironmentDialog dialog = new EnvironmentDialog(GExpert.this, env);
-        dialog.showCentered();
     }
 
     /**
