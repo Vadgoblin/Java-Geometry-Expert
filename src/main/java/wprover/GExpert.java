@@ -38,6 +38,8 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 import org.apache.commons.cli.*;
+import wprover.CheerpJIntegration.CheerpJIntegration;
+import wprover.CheerpJIntegration.WebFileChooser;
 
 
 /**
@@ -160,6 +162,8 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         addWindowListener(this);
 
         this.getContentPane().add(contentPane, BorderLayout.CENTER);
+
+        System.out.println("WebFileChooser classname: "+WebFileChooser.class.getName());
     }
 
     /**
@@ -1826,12 +1830,16 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 openAFile((File) src);
             } else {
                 if(CheerpJIntegration.isRunningInCheerpJ()){
-                    try{
-                        System.out.println(CheerpJIntegration.class.getName());
-//                        NativeFileBridge.showOpenDialog();
-                    }
-                    catch(Exception ex){
-                        System.err.println("RIP! ex: "+ ex.toString());
+                    WebFileChooser chooser = new WebFileChooser();
+
+                    int result = chooser.showOpenDialog(this);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            File file = chooser.getSelectedFile();
+                            openAFile(file);
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
+                        }
                     }
                 }else{
                     JFileChooser chooser = getFileChooser(false);

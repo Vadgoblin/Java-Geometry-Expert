@@ -1,6 +1,7 @@
 package wprover;
 
 import UI.DropShadowBorder;
+import wprover.CheerpJIntegration.CheerpJIntegration;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

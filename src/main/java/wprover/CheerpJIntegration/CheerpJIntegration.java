@@ -1,10 +1,10 @@
-package wprover;
+package wprover.CheerpJIntegration;
 
 public final class CheerpJIntegration {
 
     public static final boolean IS_RUNNING_IN_CHEERPJ = checkCheerpJ();
 
-    public CheerpJIntegration() {
+    private CheerpJIntegration() {
 
     }
 
