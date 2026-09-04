@@ -1706,49 +1706,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         if (command.equals("example")) {
             this.openResourceFile(pname);
         } else if (command.equals("Save as PS")) {
-            if (!need_save())
-                return;
-
-            DialogPsProperty dlg = new DialogPsProperty(this);
-            this.centerDialog(dlg);
-            dlg.setVisible(true);
-            int r = dlg.getSavePsType();
-            boolean ptf = dlg.getPointfilled();
-//            boolean pts = dlg.getisProveTextSaved();
-
-            if (r == 0 || r == 1 || r == 2) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setFileFilter(new FileFilter() {
-                    public boolean accept(File f) {
-                        return f.isDirectory() || f.getName().endsWith("ps");
-                    }
-
-                    public String getDescription() {
-                        return "PostScript (*.ps)";
-                    }
-                });
-                String dr = getUserDir();
-                chooser.setCurrentDirectory(new File(dr));
-
-                int result = chooser.showSaveDialog(this);
-                if (result == JFileChooser.CANCEL_OPTION) {
-                    return;
-                }
-                try {
-                    File file = chooser.getSelectedFile();
-                    String path = file.getPath();
-                    if (!path.endsWith(".ps")) {
-                        path += ".ps";
-                    }
-                    if (file.exists() && get_User_Overwrite_Option(file.getName())) {
-                        return;
-                    }
-                    dp.write_ps(path, r, ptf, true);
-                } catch (Exception ee) {
-                    CMisc.print(ee.toString() + "\n" + ee.getStackTrace());
-                }
-            }
-
+            saveAsPS();
         } else if (command.equalsIgnoreCase("Save as PDF")) {
             this.saveAsPDF();
         } else if (command.equals("Save as Image")) {
@@ -4073,6 +4031,55 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, GExpert.getTranslationViaGettext("Can not open link {0}", url) + "\n" +
                         e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * Saves the current view as a PostScript file.
+     * Prompts the user to choose a file and generates the PS output.
+     */
+    private void saveAsPS(){
+        if (!need_save())
+            return;
+
+        DialogPsProperty dlg = new DialogPsProperty(this);
+        this.centerDialog(dlg);
+        dlg.setVisible(true);
+        int r = dlg.getSavePsType();
+        boolean ptf = dlg.getPointfilled();
+//            boolean pts = dlg.getisProveTextSaved();
+
+        if (r == 0 || r == 1 || r == 2) {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileFilter() {
+                public boolean accept(File f) {
+                    return f.isDirectory() || f.getName().endsWith("ps");
+                }
+
+                public String getDescription() {
+                    return "PostScript (*.ps)";
+                }
+            });
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
+            try {
+                File file = chooser.getSelectedFile();
+                String path = file.getPath();
+                if (!path.endsWith(".ps")) {
+                    path += ".ps";
+                }
+                if (file.exists() && get_User_Overwrite_Option(file.getName())) {
+                    return;
+                }
+                dp.write_ps(path, r, ptf, true);
+            } catch (Exception ee) {
+                CMisc.print(ee.toString() + "\n" + ee.getStackTrace());
             }
         }
     }
