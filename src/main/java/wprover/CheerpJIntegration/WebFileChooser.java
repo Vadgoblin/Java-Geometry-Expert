@@ -9,10 +9,10 @@ public class WebFileChooser {
 
     private File selectedFile;
 
-    public int showOpenDialog(Object parent) {
+    public int showOpenDialog(Object parent, String[] extensions) {
         selectedFile = null;
 
-        String virtualPath = triggerJsFileDialog();
+        String virtualPath = triggerJsFileDialog(extensions);
 
         if (virtualPath != null && !virtualPath.isEmpty()) {
             this.selectedFile = new File(virtualPath);
@@ -27,5 +27,5 @@ public class WebFileChooser {
     }
 
     // Declare native method for calling JavaScript
-    private static native String triggerJsFileDialog();
+    private static native String triggerJsFileDialog(String[] extensions);
 }
