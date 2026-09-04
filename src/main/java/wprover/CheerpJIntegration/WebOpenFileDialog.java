@@ -2,7 +2,7 @@ package wprover.CheerpJIntegration;
 
 import java.io.File;
 
-public class WebFileChooser {
+public class WebOpenFileDialog {
 
     public static final int APPROVE_OPTION = 0;
     public static final int CANCEL_OPTION = 1;

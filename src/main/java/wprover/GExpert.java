@@ -39,7 +39,7 @@ import java.util.jar.JarInputStream;
 
 import org.apache.commons.cli.*;
 import wprover.CheerpJIntegration.CheerpJIntegration;
-import wprover.CheerpJIntegration.WebFileChooser;
+import wprover.CheerpJIntegration.WebOpenFileDialog;
 
 
 /**
@@ -1834,7 +1834,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 openAFile((File) src);
             } else {
                 if(CheerpJIntegration.isRunningInCheerpJ()){
-                    WebFileChooser chooser = new WebFileChooser();
+                    WebOpenFileDialog chooser = new WebOpenFileDialog();
 
                     int result = chooser.showOpenDialog(this, new String[]{".gex"});
                     if (result == JFileChooser.APPROVE_OPTION) {
@@ -1865,7 +1865,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 openGGBFile((File) src);
             } else {
                 if(CheerpJIntegration.isRunningInCheerpJ()){
-                    WebFileChooser chooser = new WebFileChooser();
+                    WebOpenFileDialog chooser = new WebOpenFileDialog();
 
                     int result = chooser.showOpenDialog(this, new String[]{".ggb"});
                     if (result == JFileChooser.APPROVE_OPTION) {
