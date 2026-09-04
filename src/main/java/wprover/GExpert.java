@@ -1732,10 +1732,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } else if (command.equalsIgnoreCase("Open GDD Proof in GraphViz Online")) {
             this.openGDDProofGraphVizOnline();
         } else if (command.equals("Save as Text")) {
-            if (!need_save())
-                return;
-
-            saveAsText();
+            this.saveAsText();
         } else if (command.equals("Open")) {
 
             if (src instanceof File) {
@@ -2160,6 +2157,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     private void saveAsText() {
+        if (!need_save())
+            return;
+
         GTerm gt = pprove.getConstructionTerm();
         if (gt == null) {
             return;
