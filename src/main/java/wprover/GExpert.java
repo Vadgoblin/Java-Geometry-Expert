@@ -1864,14 +1864,29 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             if (src instanceof File) {
                 openGGBFile((File) src);
             } else {
-                JFileChooser chooser = getFileChooser(true);
-                int result = chooser.showOpenDialog(this);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    try {
-                        File file = chooser.getSelectedFile();
-                        openGGBFile(file);
-                    } catch (Exception ee) {
-                        ee.printStackTrace();
+                if(CheerpJIntegration.isRunningInCheerpJ()){
+                    WebFileChooser chooser = new WebFileChooser();
+
+                    int result = chooser.showOpenDialog(this, new String[]{".ggb"});
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            File file = chooser.getSelectedFile();
+                            openGGBFile(file);
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
+                        }
+                    }
+                }
+                else {
+                    JFileChooser chooser = getFileChooser(true);
+                    int result = chooser.showOpenDialog(this);
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        try {
+                            File file = chooser.getSelectedFile();
+                            openGGBFile(file);
+                        } catch (Exception ee) {
+                            ee.printStackTrace();
+                        }
                     }
                 }
             }
