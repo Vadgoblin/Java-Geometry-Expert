@@ -2462,7 +2462,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     public boolean saveAFile(boolean n) {
         if (CheerpJIntegration.isRunningInCheerpJ()) {
             try {
-                saveAFile("/str/unnamed.gex");
+                saveAFileCheerpJ("/str/unnamed.gex");
             } catch (IOException e) {
                 System.err.println("Failed to save file for web download. " + e.toString());
             }
@@ -2615,20 +2615,20 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * @throws IOException if an I/O error occurs during saving
      */
     public void saveAFile(String path) throws IOException {
-        if (CheerpJIntegration.isRunningInCheerpJ()) {
-            DataOutputStream out = dp.openOutputFile("/files/unnamed.gex");
-            dp.Save(out);
-            pprove.SaveProve(out);
-            out.close();
+        DataOutputStream out = dp.openOutputFile(path);
+        dp.Save(out);
+        pprove.SaveProve(out);
+        out.close();
+    }
 
-            WebSaveFileDialog wsf = new WebSaveFileDialog();
-            wsf.showSaveDialog(this, "/files/unnamed.gex", "unnamed.gex");
-        } else {
-            DataOutputStream out = dp.openOutputFile(path);
-            dp.Save(out);
-            pprove.SaveProve(out);
-            out.close();
-        }
+    public void saveAFileCheerpJ(String path) throws IOException {
+        DataOutputStream out = dp.openOutputFile("/files/unnamed.gex");
+        dp.Save(out);
+        pprove.SaveProve(out);
+        out.close();
+
+        WebSaveFileDialog wsf = new WebSaveFileDialog();
+        wsf.showSaveDialog(this, "/files/unnamed.gex", "unnamed.gex");
     }
 
     /**
