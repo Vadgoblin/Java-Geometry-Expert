@@ -1678,8 +1678,6 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * @param src     the source object that triggered the command (e.g., JMenuItem, JToggleButton, or File)
      */
     synchronized public void sendAction(String command, Object src) {
-
-
         String tip = null;
         String ps = null;
         String pname = null;
@@ -1730,66 +1728,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } else if (command.equals("Save as Text")) {
             this.saveAsText();
         } else if (command.equals("Open")) {
-
-            if (src instanceof File) {
-                openAFile((File) src);
-            } else {
-                if (CheerpJIntegration.isRunningInCheerpJ()) {
-                    WebOpenFileDialog chooser = new WebOpenFileDialog();
-
-                    int result = chooser.showOpenDialog(this, new String[]{".gex"});
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            File file = chooser.getSelectedFile();
-                            openAFile(file);
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
-                        }
-                    }
-                } else {
-                    JFileChooser chooser = getFileChooser(false);
-
-                    int result = chooser.showOpenDialog(this);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            File file = chooser.getSelectedFile();
-                            openAFile(file);
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
-                        }
-                    }
-                }
-            }
-            // Handle import of ggb file
+            this.open(src);
         } else if (command.equals("Import")) {
-            if (src instanceof File) {
-                openGGBFile((File) src);
-            } else {
-                if (CheerpJIntegration.isRunningInCheerpJ()) {
-                    WebOpenFileDialog chooser = new WebOpenFileDialog();
-
-                    int result = chooser.showOpenDialog(this, new String[]{".ggb"});
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            File file = chooser.getSelectedFile();
-                            openGGBFile(file);
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
-                        }
-                    }
-                } else {
-                    JFileChooser chooser = getFileChooser(true);
-                    int result = chooser.showOpenDialog(this);
-                    if (result == JFileChooser.APPROVE_OPTION) {
-                        try {
-                            File file = chooser.getSelectedFile();
-                            openGGBFile(file);
-                        } catch (Exception ee) {
-                            ee.printStackTrace();
-                        }
-                    }
-                }
-            }
+            this.import_(src);
         } else if (command.equals("Exit")) {
             if (saveBeforeExit())
                 System.exit(0);
@@ -2149,6 +2090,69 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 dlg.setVisible(true);
             }
 
+        }
+    }
+
+    private void open(Object src){
+        if (src instanceof File) {
+            openAFile((File) src);
+        } else {
+            if (CheerpJIntegration.isRunningInCheerpJ()) {
+                WebOpenFileDialog chooser = new WebOpenFileDialog();
+
+                int result = chooser.showOpenDialog(this, new String[]{".gex"});
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openAFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            } else {
+                JFileChooser chooser = getFileChooser(false);
+
+                int result = chooser.showOpenDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openAFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private void import_(Object src){
+        if (src instanceof File) {
+            openGGBFile((File) src);
+        } else {
+            if (CheerpJIntegration.isRunningInCheerpJ()) {
+                WebOpenFileDialog chooser = new WebOpenFileDialog();
+
+                int result = chooser.showOpenDialog(this, new String[]{".ggb"});
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openGGBFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            } else {
+                JFileChooser chooser = getFileChooser(true);
+                int result = chooser.showOpenDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openGGBFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            }
         }
     }
 
