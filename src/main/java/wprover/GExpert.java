@@ -2636,9 +2636,8 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         dp.Save(out);
         pprove.SaveProve(out);
         out.close();
-
-        WebSaveFileDialog wsf = new WebSaveFileDialog();
-        wsf.showSaveDialog(this, filePath, fileName);
+        
+        WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
     }
 
     /**
