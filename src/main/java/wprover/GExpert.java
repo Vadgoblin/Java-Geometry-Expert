@@ -1793,39 +1793,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             if (!need_save())
                 return;
 
-            GTerm gt = pprove.getConstructionTerm();
-            if (gt != null) {
-                JFileChooser filechooser1 = new JFileChooser();
-                String dr = getUserDir();
-                filechooser1.setCurrentDirectory(new File(dr));
-
-                int result = filechooser1.showDialog(this, getLanguage("Save"));
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File f = filechooser1.getSelectedFile();
-                    FileOutputStream fp;
-                    try {
-                        if (f.exists()) {
-                            f.delete();
-                            fp = new FileOutputStream(f, true);
-                            fp.write("\n\n".getBytes());
-                        } else {
-                            f.createNewFile();
-                            fp = new FileOutputStream(f, false);
-                        }
-                        if (fp == null) {
-                            return;
-                        }
-                        gt.writeAterm(fp);
-                        dp.writePointPosition(fp);
-                        fp.close();
-                    } catch (IOException ee) {
-                        JOptionPane.showMessageDialog(this, ee.getMessage(),
-                                "Save Error", JOptionPane.ERROR_MESSAGE);
-                    }
-
-                }
-
-            }
+            saveAsText();
         } else if (command.equals("Open")) {
 
             if (src instanceof File) {
@@ -2249,6 +2217,40 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         }
     }
 
+    private void saveAsText(){
+        GTerm gt = pprove.getConstructionTerm();
+        if (gt != null) {
+            JFileChooser filechooser1 = new JFileChooser();
+            String dr = getUserDir();
+            filechooser1.setCurrentDirectory(new File(dr));
+
+            int result = filechooser1.showDialog(this, getLanguage("Save"));
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File f = filechooser1.getSelectedFile();
+                FileOutputStream fp;
+                try {
+                    if (f.exists()) {
+                        f.delete();
+                        fp = new FileOutputStream(f, true);
+                        fp.write("\n\n".getBytes());
+                    } else {
+                        f.createNewFile();
+                        fp = new FileOutputStream(f, false);
+                    }
+                    if (fp == null) {
+                        return;
+                    }
+                    gt.writeAterm(fp);
+                    dp.writePointPosition(fp);
+                    fp.close();
+                } catch (IOException ee) {
+                    JOptionPane.showMessageDialog(this, ee.getMessage(),
+                            "Save Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
     /**
      * Show a warning on saving file in an unsafe folder that will be removed after closing JGEX.
      * In a Flathub sandbox, this is an important message for the user because the OS
@@ -2636,7 +2638,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         dp.Save(out);
         pprove.SaveProve(out);
         out.close();
-        
+
         WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
     }
 
