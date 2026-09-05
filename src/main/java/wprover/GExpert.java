@@ -2253,39 +2253,64 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * @param src the source object, which can be a File or another object
      */
     private void saveGDDProofAsGraphViz(Object src) {
-        File ff;
-        if (src instanceof File) {
-            ff = (File) src;
-        } else {
-            JFileChooser chooser = new JFileChooser();
-            chooser.setFileFilter(new JFileFilter("gv"));
-
-            String dr1 = getUserDir();
-            chooser.setCurrentDirectory(new File(dr1));
-
-            int result = chooser.showSaveDialog(this);
-            if (result == JFileChooser.CANCEL_OPTION) {
-                return;
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
             }
-            String dr = getUserDir();
-            chooser.setCurrentDirectory(new File(dr));
 
-            ff = chooser.getSelectedFile();
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".gv";
+            }
+
+            String filePath = "/files/" + fileName;
+
+            try {
+                Path path = Paths.get(filePath);
+                String program = PanelProve.graphvizProgram;
+                Files.write(path, java.util.List.of(program.split("\n")), StandardCharsets.UTF_8);
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+        } else {
+            File ff;
+            if (src instanceof File) {
+                ff = (File) src;
+            } else {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setFileFilter(new JFileFilter("gv"));
+
+                String dr1 = getUserDir();
+                chooser.setCurrentDirectory(new File(dr1));
+
+                int result = chooser.showSaveDialog(this);
+                if (result == JFileChooser.CANCEL_OPTION) {
+                    return;
+                }
+                String dr = getUserDir();
+                chooser.setCurrentDirectory(new File(dr));
+
+                ff = chooser.getSelectedFile();
+            }
+            String p = ff.getPath();
+            if (!p.endsWith("gv") && !p.endsWith("GV")) {
+                p = p + ".gv";
+                ff = new File(p);
+            }
+            try {
+                DataOutputStream out = dp.openOutputFile(ff.getPath()); // do we even need this?
+                Path path = Paths.get(ff.getPath());
+                String program = PanelProve.graphvizProgram;
+                Files.write(path, java.util.List.of(program.split("\n")), StandardCharsets.UTF_8);
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+            showWarningUnsafeFolder(ff);
         }
-        String p = ff.getPath();
-        if (!p.endsWith("gv") && !p.endsWith("GV")) {
-            p = p + ".gv";
-            ff = new File(p);
-        }
-        try {
-            DataOutputStream out = dp.openOutputFile(ff.getPath());
-            Path path = Paths.get(ff.getPath());
-            String program = PanelProve.graphvizProgram;
-            Files.write(path, java.util.List.of(program.split("\n")), StandardCharsets.UTF_8);
-        } catch (Exception ee) {
-            ee.printStackTrace();
-        }
-        showWarningUnsafeFolder(ff);
     }
 
     /**
