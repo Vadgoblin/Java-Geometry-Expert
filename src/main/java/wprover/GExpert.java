@@ -2686,6 +2686,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
         if (!need_save())
             return;
+
         AnimateC am = dp.getAnimateC();
         if (am == null) {
             JOptionPane.showMessageDialog(this, getLanguage("No animation has been defined.") + "\n"
@@ -2710,54 +2711,116 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } else
             return;
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new JFileFilter("GIF"));
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
 
-        int result = chooser.showSaveDialog(this);
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return;
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".gif";
+            }
+
+            String filePath = "/files/" + fileName;
+            File file = new File(filePath);
+
+            am.reCalculate();
+            int n = am.getRounds();
+            if (n == 0) return;
+
+            int v = 1000 / am.getInitValue();
+
+            GIFProcessDialog dlg1 = new GIFProcessDialog(this.getFrame());
+            this.centerDialog(dlg1);
+            dlg1.setTotal(n);
+
+            int k = 0;
+
+            try {
+                DataOutputStream out = dp.openOutputFile(file.getPath());
+                GifEncoder e = new GifEncoder();
+                e.setQuality(q);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(v);   // 1 frame per sec
+                dlg1.en = e;
+                dlg1.dp = dp;
+                dlg1.rect = rect;
+                dlg1.am = am;
+                dlg1.gxInstance = this;
+                dlg1.out = out;
+                dlg1.setVisible(true);
+                dlg1.setRun();
+
+                // Not sure why is this commented out. Keeping it just in case. 
+//            while (n >= 0) {
+//                am.onTimer();
+//                if (!dp.reCalculate()) {
+//                    am.resetXY();
+//                }
+//                e.addFrame(this.getBufferedImage(rect));
+//                n--;
+//            }
+//            e.finish();
+//            out.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+
+            } catch (IOException ee) {
+                System.out.println(ee.getMessage());
+            }
         }
+        else{
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new JFileFilter("GIF"));
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
 
 
-        File ff = chooser.getSelectedFile();
-        showWarningUnsafeFolder(ff);
+            File ff = chooser.getSelectedFile();
+            showWarningUnsafeFolder(ff);
 
-        String p = ff.getPath();
-        if (!p.endsWith("gif") && !p.endsWith("GIF")) {
-            p = p + ".gif";
-            ff = new File(p);
-        }
+            String p = ff.getPath();
+            if (!p.endsWith("gif") && !p.endsWith("GIF")) {
+                p = p + ".gif";
+                ff = new File(p);
+            }
 
 
-        am.reCalculate();
-        int n = am.getRounds();
-        if (n == 0) return;
+            am.reCalculate();
+            int n = am.getRounds();
+            if (n == 0) return;
 
-        int v = 1000 / am.getInitValue();
+            int v = 1000 / am.getInitValue();
 
-        GIFProcessDialog dlg1 = new GIFProcessDialog(this.getFrame());
-        this.centerDialog(dlg1);
-        dlg1.setTotal(n);
+            GIFProcessDialog dlg1 = new GIFProcessDialog(this.getFrame());
+            this.centerDialog(dlg1);
+            dlg1.setTotal(n);
 
-        int k = 0;
+            int k = 0;
 
-        try {
-            DataOutputStream out = dp.openOutputFile(ff.getPath());
-            GifEncoder e = new GifEncoder();
-            e.setQuality(q);
-            e.start(out);
-            e.setRepeat(0);
-            e.setDelay(v);   // 1 frame per sec
-            dlg1.en = e;
-            dlg1.dp = dp;
-            dlg1.rect = rect;
-            dlg1.am = am;
-            dlg1.gxInstance = this;
-            dlg1.out = out;
-            dlg1.setVisible(true);
-            dlg1.setRun();
+            try {
+                DataOutputStream out = dp.openOutputFile(ff.getPath());
+                GifEncoder e = new GifEncoder();
+                e.setQuality(q);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(v);   // 1 frame per sec
+                dlg1.en = e;
+                dlg1.dp = dp;
+                dlg1.rect = rect;
+                dlg1.am = am;
+                dlg1.gxInstance = this;
+                dlg1.out = out;
+                dlg1.setVisible(true);
+                dlg1.setRun();
 
 //            while (n >= 0) {
 //                am.onTimer();
@@ -2770,11 +2833,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 //            e.finish();
 //            out.close();
 
-        } catch (IOException ee) {
-            System.out.println(ee.getMessage());
+            } catch (IOException ee) {
+                System.out.println(ee.getMessage());
+            }
         }
-
-
     }
 
     /**
