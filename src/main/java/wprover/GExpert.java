@@ -2786,81 +2786,33 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         if (!need_save())
             return;
 
-        Rectangle rect = null;
-        RectChooser rchoose = new RectChooser(this);
-        if (rchoose.getReturnResult()) {
-            rect = rchoose.getSelectedRectangle();
-        } else
-            return;
-
-        JFileChooser chooser = new JFileChooser();
-        String[] s = ImageIO.getWriterFormatNames();
-        String[] s1 = new String[s.length + 1];
-        for (int i = 0; i < s.length; i++)
-            s1[i] = s[i];
-        s1[s.length] = "gif";
-        s = s1;
-
-        if (s.length > 0) {
-            FileFilter t = chooser.getFileFilter();
-            chooser.removeChoosableFileFilter(t);
-
-            JFileFilter selected = null;
-            for (int i = 0; i < s.length; i++) {
-                JFileFilter f = new JFileFilter(s[i]);
-                chooser.addChoosableFileFilter(f);
-
-                if (s[i].equalsIgnoreCase("JPG"))
-                    selected = f;
-                if (selected == null && s[i].equalsIgnoreCase("JPEG"))
-                    selected = f;
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
             }
-            chooser.setFileFilter(selected);
-        }
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
 
-        int result = chooser.showSaveDialog(this);
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return;
-        }
-
-        File ff = chooser.getSelectedFile();
-        showWarningUnsafeFolder(ff);
-
-        FileFilter f = chooser.getFileFilter();
-        String endfix = f.getDescription();
-        if (endfix == null)
-            return;
-
-        String p = ff.getPath();
-        if (!p.endsWith(endfix)) {
-            p = p + "." + endfix;
-            ff = new File(p);
-        }
-
-        if (endfix.equals("gif")) {
-            try {
-                DataOutputStream out = dp.openOutputFile(ff.getPath());
-                GifEncoder e = new GifEncoder();
-                e.setQuality(1);
-                e.start(out);
-                e.setRepeat(0);
-                e.setDelay(0);
-                e.addFrame(this.getBufferedImage(rect));
-                e.finish();
-                out.close();
-            } catch (IOException ee) {
-                if (CMisc.isDebug())
-                    ee.printStackTrace();
-                else JOptionPane.showMessageDialog(this, ee.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".png";
             }
-        } else {
+
+            String filePath = "/files/" + fileName;
+            File file = new File(filePath);
+
+            Rectangle rect = null;
+            RectChooser rchoose = new RectChooser(this);
+            if (rchoose.getReturnResult()) {
+                rect = rchoose.getSelectedRectangle();
+            } else
+                return;
+
             BufferedImage image = getBufferedImage(rect);
-            Iterator iter = ImageIO.getImageWritersByFormatName(endfix);
+            Iterator iter = ImageIO.getImageWritersByFormatName("png");
             ImageWriter writer = (ImageWriter) iter.next();
             try {
-                ImageOutputStream imageOut = ImageIO.createImageOutputStream(ff);
+                ImageOutputStream imageOut = ImageIO.createImageOutputStream(file);
                 writer.setOutput(imageOut);
 
                 writer.write(new IIOImage(image, null, null));
@@ -2868,14 +2820,102 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 if (writer.canInsertImage(0))
                     writer.writeInsert(0, iioImage, null);
                 imageOut.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
             } catch (IOException exception) {
-                if (CMisc.isDebug())
-                    exception.printStackTrace();
-                else
-                    JOptionPane.showMessageDialog(this, exception.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, exception.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            Rectangle rect = null;
+            RectChooser rchoose = new RectChooser(this);
+            if (rchoose.getReturnResult()) {
+                rect = rchoose.getSelectedRectangle();
+            } else
+                return;
+
+            JFileChooser chooser = new JFileChooser();
+            String[] s = ImageIO.getWriterFormatNames();
+            String[] s1 = new String[s.length + 1];
+            for (int i = 0; i < s.length; i++)
+                s1[i] = s[i];
+            s1[s.length] = "gif";
+            s = s1;
+
+            if (s.length > 0) {
+                FileFilter t = chooser.getFileFilter();
+                chooser.removeChoosableFileFilter(t);
+
+                JFileFilter selected = null;
+                for (int i = 0; i < s.length; i++) {
+                    JFileFilter f = new JFileFilter(s[i]);
+                    chooser.addChoosableFileFilter(f);
+
+                    if (s[i].equalsIgnoreCase("JPG"))
+                        selected = f;
+                    if (selected == null && s[i].equalsIgnoreCase("JPEG"))
+                        selected = f;
+                }
+                chooser.setFileFilter(selected);
+            }
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
+
+            File ff = chooser.getSelectedFile();
+            showWarningUnsafeFolder(ff);
+
+            FileFilter f = chooser.getFileFilter();
+            String endfix = f.getDescription();
+            if (endfix == null)
+                return;
+
+            String p = ff.getPath();
+            if (!p.endsWith(endfix)) {
+                p = p + "." + endfix;
+                ff = new File(p);
+            }
+
+            if (endfix.equals("gif")) {
+                try {
+                    DataOutputStream out = dp.openOutputFile(ff.getPath());
+                    GifEncoder e = new GifEncoder();
+                    e.setQuality(1);
+                    e.start(out);
+                    e.setRepeat(0);
+                    e.setDelay(0);
+                    e.addFrame(this.getBufferedImage(rect));
+                    e.finish();
+                    out.close();
+                } catch (IOException ee) {
+                    if (CMisc.isDebug())
+                        ee.printStackTrace();
+                    else JOptionPane.showMessageDialog(this, ee.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                BufferedImage image = getBufferedImage(rect);
+                Iterator iter = ImageIO.getImageWritersByFormatName(endfix);
+                ImageWriter writer = (ImageWriter) iter.next();
+                try {
+                    ImageOutputStream imageOut = ImageIO.createImageOutputStream(ff);
+                    writer.setOutput(imageOut);
+
+                    writer.write(new IIOImage(image, null, null));
+                    IIOImage iioImage = new IIOImage(image, null, null);
+                    if (writer.canInsertImage(0))
+                        writer.writeInsert(0, iioImage, null);
+                    imageOut.close();
+                } catch (IOException exception) {
+                    if (CMisc.isDebug())
+                        exception.printStackTrace();
+                    else
+                        JOptionPane.showMessageDialog(this, exception.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
-
     }
 
 
