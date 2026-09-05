@@ -165,6 +165,7 @@ public class AboutDialog extends JPopupMenu implements MouseListener {
      * @param e the event to be processed
      */
     public void mousePressed(MouseEvent e) {
+        System.out.println("public void mousePressed(MouseEvent e)");
         if (e.getSource() == b2)
             GExpert.openURL("https://github.com/kovzol/Java-Geometry-Expert"); // FIXME: it opens twice
         this.setVisible(false);

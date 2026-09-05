@@ -39,6 +39,7 @@ import java.util.jar.JarInputStream;
 
 import org.apache.commons.cli.*;
 import wprover.CheerpJIntegration.CheerpJIntegration;
+import wprover.CheerpJIntegration.OpenWebPage;
 import wprover.CheerpJIntegration.WebOpenFileDialog;
 import wprover.CheerpJIntegration.WebSaveFileDialog;
 
@@ -4159,30 +4160,17 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         // check if we're running in CheerpJ/web environment
         if (CheerpJIntegration.isRunningInCheerpJ()) {
             try {
-                // for file:/// URLs in CheerpJ, we need to handle them differently
-                if (url.startsWith("file:///")) {
-                    // FIXME: This does not work at the moment.
-                    // convert file:/// URL to a relative path for resource loading
-                    String relativePath = url.substring(url.indexOf("/help/"));
+                String targetUrl = url;
 
-                    // in CheerpJ, we can use JavaScript to open the URL in a new tab/window
-                    // this requires the resources to be available at the relative path from the web root
-                    String jsCode = "window.open('" + relativePath + "', '_blank');";
-
-                    // execute JavaScript via CheerpJ's JavaScript bridge
-                    Class<?> jsClass = Class.forName("com.leaningtech.client.Global");
-                    Method evalMethod = jsClass.getMethod("eval", String.class);
-                    evalMethod.invoke(null, jsCode);
-                    return;
+                // help is expected to be avialable on the webserver hosting jgex/CheerpJ
+                final String PREFIX = "file:////files//";
+                if(targetUrl.startsWith(PREFIX)){
+                    targetUrl = targetUrl.substring(PREFIX.length());
                 }
 
-                // for regular URLs (http, https), use JavaScript to open them
-                String command = "xdg-open " + url;
-                Runtime.getRuntime().exec(command);
+                OpenWebPage.openWebPageJs(targetUrl);
             } catch (Exception e) {
-                // fallback to showing a message with the URL if JavaScript bridge fails
-                JOptionPane.showMessageDialog(null,
-                        GExpert.getTranslationViaGettext("Please open this URL in your browser: {0}", url));
+                e.printStackTrace();
             }
         } else {
             // original desktop behavior
