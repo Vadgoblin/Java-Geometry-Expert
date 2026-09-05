@@ -4137,58 +4137,93 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         if (!need_save())
             return;
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new FileFilter() {
-            public boolean accept(File f) {
-                if (f.isDirectory())
-                    return true;
-
-                String s = f.getName();
-                if (s.endsWith("pdf") || s.endsWith("PDF"))
-                    return true;
-                return false;
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
             }
 
-            public String getDescription() {
-                return "Adobe PDF File (*.pdf)";
-            }
-        });
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
-        int n = chooser.showOpenDialog(this);
-        if (n != JFileChooser.OPEN_DIALOG)
-            return;
-
-        try {
-            File file = chooser.getSelectedFile();
-            String path = file.getPath();
-            if (path.endsWith("PDF") || path.endsWith("pdf")) {
-            } else {
-                file = new File(path + ".pdf");
-            }
-            if (file.exists()) {
-                int n2 = JOptionPane.showConfirmDialog(this,
-                        getTranslationViaGettext("{0} already exists, do you want to overwrite it?", file.getName()),
-                        "File Exists", JOptionPane.YES_NO_CANCEL_OPTION);
-                if (n2 != JOptionPane.YES_OPTION) {
-                    return;
-                }
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".pdf";
             }
 
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            String filePath = "/files/" + fileName;
+
+            try {
+                File file = new File(filePath);
+
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
 
 
-            Graphics pdfGraphics = null;
-            PDFJob job = new PDFJob(fileOutputStream);
-            pdfGraphics = job.getGraphics();
-            d.paintAll(pdfGraphics);
-            pdfGraphics.dispose();
-            job.end();
-            fileOutputStream.close();
-        } catch (IOException ee) {
-            JOptionPane.showMessageDialog(this, ee.getMessage());
+                Graphics pdfGraphics = null;
+                PDFJob job = new PDFJob(fileOutputStream);
+                pdfGraphics = job.getGraphics();
+                d.paintAll(pdfGraphics);
+                pdfGraphics.dispose();
+                job.end();
+                fileOutputStream.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+
+            } catch (IOException ee) {
+                JOptionPane.showMessageDialog(this, ee.getMessage());
+            }
         }
+        else{
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileFilter() {
+                public boolean accept(File f) {
+                    if (f.isDirectory())
+                        return true;
 
+                    String s = f.getName();
+                    if (s.endsWith("pdf") || s.endsWith("PDF"))
+                        return true;
+                    return false;
+                }
+
+                public String getDescription() {
+                    return "Adobe PDF File (*.pdf)";
+                }
+            });
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+            int n = chooser.showOpenDialog(this);
+            if (n != JFileChooser.OPEN_DIALOG)
+                return;
+
+            try {
+                File file = chooser.getSelectedFile();
+                String path = file.getPath();
+                if (path.endsWith("PDF") || path.endsWith("pdf")) {
+                } else {
+                    file = new File(path + ".pdf");
+                }
+                if (file.exists()) {
+                    int n2 = JOptionPane.showConfirmDialog(this,
+                            getTranslationViaGettext("{0} already exists, do you want to overwrite it?", file.getName()),
+                            "File Exists", JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (n2 != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                }
+
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+
+                Graphics pdfGraphics = null;
+                PDFJob job = new PDFJob(fileOutputStream);
+                pdfGraphics = job.getGraphics();
+                d.paintAll(pdfGraphics);
+                pdfGraphics.dispose();
+                job.end();
+                fileOutputStream.close();
+            } catch (IOException ee) {
+                JOptionPane.showMessageDialog(this, ee.getMessage());
+            }
+        }
     }
 
     /**
