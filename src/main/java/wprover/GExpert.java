@@ -1704,7 +1704,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         if (command.equals("example")) {
             this.openResourceFile(pname);
         } else if (command.equals("Save as PS")) {
-            saveAsPS();
+            this.saveAsPS();
         } else if (command.equalsIgnoreCase("Save as PDF")) {
             this.saveAsPDF();
         } else if (command.equals("Save as Image")) {
@@ -4069,7 +4069,33 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         boolean ptf = dlg.getPointfilled();
 //            boolean pts = dlg.getisProveTextSaved();
 
-        if (r == 0 || r == 1 || r == 2) {
+        if (r < 0 || r > 2){
+            return;
+        }
+
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
+
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".ps";
+            }
+
+            String filePath = "/files/" + fileName;
+
+            try {
+                dp.write_ps(filePath, r, ptf, true);
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            }
+            catch (Exception e){
+                System.err.println("Failed to save as PS: " + e);
+            }
+        }
+        else  {
             JFileChooser chooser = new JFileChooser();
             chooser.setFileFilter(new FileFilter() {
                 public boolean accept(File f) {
