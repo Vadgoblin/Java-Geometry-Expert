@@ -2632,50 +2632,88 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         Rectangle rc = r1.getRectangle();
 
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new JFileFilter("GIF"));
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
 
-        String dr1 = getUserDir();
-        chooser.setCurrentDirectory(new File(dr1));
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".gif";
+            }
 
-        int result = chooser.showSaveDialog(this);
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return;
+            String filePath = "/files/" + fileName;
+//            File file = new File(filePath);
+
+            try {
+                DataOutputStream out = dp.openOutputFile(filePath);
+                GifEncoder e = new GifEncoder();
+                e.setQuality(20);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(200);   // 1 frame per sec
+
+                ImageTimer t = new ImageTimer(this);
+                t.setEncorder(e);
+                t.setRectangle(rc);
+
+                t.setProveBar(provePanelbar);
+                t.setDelay(200);
+                t.setVisible(true);
+                e.finish();
+                out.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+
+        }else{
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new JFileFilter("GIF"));
+
+            String dr1 = getUserDir();
+            chooser.setCurrentDirectory(new File(dr1));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            File ff = chooser.getSelectedFile();
+            showWarningUnsafeFolder(ff);
+
+            String p = ff.getPath();
+            if (!p.endsWith("gif") && !p.endsWith("GIF")) {
+                p = p + ".gif";
+                ff = new File(p);
+            }
+            try {
+                DataOutputStream out = dp.openOutputFile(ff.getPath());
+                GifEncoder e = new GifEncoder();
+                e.setQuality(20);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(200);   // 1 frame per sec
+
+                ImageTimer t = new ImageTimer(this);
+                t.setEncorder(e);
+                t.setRectangle(rc);
+
+                t.setProveBar(provePanelbar);
+                t.setDelay(200);
+                t.setVisible(true);
+                e.finish();
+                out.close();
+
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
         }
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
-
-        File ff = chooser.getSelectedFile();
-        showWarningUnsafeFolder(ff);
-
-        String p = ff.getPath();
-        if (!p.endsWith("gif") && !p.endsWith("GIF")) {
-            p = p + ".gif";
-            ff = new File(p);
-        }
-        try {
-            DataOutputStream out = dp.openOutputFile(ff.getPath());
-            GifEncoder e = new GifEncoder();
-            e.setQuality(20);
-            e.start(out);
-            e.setRepeat(0);
-            e.setDelay(200);   // 1 frame per sec
-
-            ImageTimer t = new ImageTimer(this);
-            t.setEncorder(e);
-            t.setRectangle(rc);
-
-            t.setProveBar(provePanelbar);
-            t.setDelay(200);
-            t.setVisible(true);
-            e.finish();
-            out.close();
-
-        } catch (Exception ee) {
-            ee.printStackTrace();
-        }
-
-
     }
 
     /**
@@ -2754,7 +2792,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 dlg1.setVisible(true);
                 dlg1.setRun();
 
-                // Not sure why is this commented out. Keeping it just in case. 
+                // Not sure why is this commented out. Keeping it just in case.
 //            while (n >= 0) {
 //                am.onTimer();
 //                if (!dp.reCalculate()) {
