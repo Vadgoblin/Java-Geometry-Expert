@@ -88,6 +88,7 @@ some features in this version:
 <ul>
  <li>Piotr Błaszczyk (Polish translation)
  <li>Jorge Cassio (Portuguese translation)
+ <li>Balázs Dékány (CheerpJ file handling improvements)
  <li>Noah Dana-Picard (French and Hebrew translation)
  <li>Ines Ganglmayr (German translation)
  <li>Philip Hallwirth (Code cleanup, CheerpJ port)
@@ -98,6 +99,6 @@ some features in this version:
  <li>Jelena Marković (Serbian translation)
  <li>Anna Petiurenko (Polish translation)
  <li>Alexander Thaller (German translation)
- <li>Alexander Vujič (Serbian and German translations)
+ <li>Alexander Vujič (Serbian and German translations, documentation)
  <li>Engelbert Zeintl (German translation)
 </ul>
