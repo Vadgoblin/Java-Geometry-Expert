@@ -93,20 +93,26 @@ async function Java_wprover_CheerpJIntegration_OpenWebPage_openWebPageJs(lib, ur
 
 
 async function main() {
-  await cheerpjInit(
-    {
-      version: 17,
-      natives: {
-          Java_wprover_CheerpJIntegration_WebOpenFileDialog_triggerJsFileDialog,
-          Java_wprover_CheerpJIntegration_WebSaveFileDialog_triggerJsFileDownload,
-          Java_wprover_CheerpJIntegration_OpenWebPage_openWebPageJs,
-      }
-    }
-  );
-  cheerpjCreateDisplay(-1, -1, document.body);
-  await cheerpjRunJar("/app/jgex.jar");
+    await cheerpjInit(
+        {
+            version: 17,
+            natives: {
+                Java_wprover_CheerpJIntegration_WebOpenFileDialog_triggerJsFileDialog,
+                Java_wprover_CheerpJIntegration_WebSaveFileDialog_triggerJsFileDownload,
+                Java_wprover_CheerpJIntegration_OpenWebPage_openWebPageJs,
+            }
+        }
+    );
+    cheerpjCreateDisplay(-1, -1, document.body);
+
+    const folderPath = window.location.pathname.substring(
+        0,
+        window.location.pathname.lastIndexOf("/") + 1
+    );
+    const jarVirtualPath = `/app${folderPath}jgex.jar`;
+    await cheerpjRunJar(jarVirtualPath);
 }
 
 main().catch((err) => {
-  console.error("CheerpJ execution error:", err);
+    console.error("CheerpJ execution error:", err);
 });
