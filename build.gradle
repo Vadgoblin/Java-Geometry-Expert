@@ -240,3 +240,34 @@ task runGproverMain2(type: JavaExec) {
     workingDir = runningDir
     mainClass = 'gprover.Main2'
 }
+
+// Task to build the web version of jgex
+tasks.register('buildWeb', Copy) {
+    dependsOn tasks.named('jar')
+
+    doFirst {
+        // CheerpJ requires Java 17
+        def currentVersion = JavaVersion.current()
+        if (currentVersion != JavaVersion.VERSION_17) {
+            throw new GradleException("task ':buildWeb' requires Java 17, but running on Java ${currentVersion.majorVersion}.")
+        }
+    }
+
+    // Copy web assets
+    from('web') {
+        into ''
+    }
+
+    // Copy and rename  the jar
+    from(tasks.named('jar')) {
+        into ''
+        rename { 'jgex.jar' }
+    }
+
+    // Copy help documentation
+    from('src/main/resources/docs/help') {
+        into 'help'
+    }
+
+    into layout.buildDirectory.dir('web-dist')
+}

@@ -2,6 +2,7 @@ package wprover;
 
 
 import UI.DropShadowBorder;
+import wprover.CheerpJIntegration.CheerpJIntegration;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -30,7 +31,7 @@ public class AboutDialog extends JPopupMenu implements MouseListener {
     public AboutDialog(GExpert f) {
         gx = f;
 
-        if (!GExpert.isRunningInCheerpJ()) {
+        if (!CheerpJIntegration.isRunningInCheerpJ()) {
             // FIXME: This does not work properly in CheerpJ.
             this.setBorder(BorderFactory.createCompoundBorder(new DropShadowBorder(), BorderFactory.createLineBorder(color, 4)));
         }
@@ -164,6 +165,7 @@ public class AboutDialog extends JPopupMenu implements MouseListener {
      * @param e the event to be processed
      */
     public void mousePressed(MouseEvent e) {
+        System.out.println("public void mousePressed(MouseEvent e)");
         if (e.getSource() == b2)
             GExpert.openURL("https://github.com/kovzol/Java-Geometry-Expert"); // FIXME: it opens twice
         this.setVisible(false);

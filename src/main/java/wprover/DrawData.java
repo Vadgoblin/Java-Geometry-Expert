@@ -269,55 +269,83 @@ public class DrawData {
 
         fp.write("%-----define color, dash and width\n".getBytes());
 
-        for (int i = 0; i < vc.size(); i++) {
-            Integer In = (Integer) vc.get(i);
-            int index = In.intValue();
-            Color c = (Color) dd.colorlist.get(index);
+        for (Object item : vc) {
+            if (!(item instanceof Number)) {
+                continue;
+            }
+            int index = ((Number) item).intValue();
+
+            if (index < 0 || index >= dd.colorlist.size()) {
+                continue;
+            }
+
+            Object colorObj = dd.colorlist.get(index);
+            Color c;
+            if (colorObj instanceof Color) {
+                c = (Color) colorObj;
+            } else if (colorObj instanceof Number) {
+                c = new Color(((Number) colorObj).intValue());
+            } else {
+                c = Color.BLACK;
+            }
+
             if (stype == 0) {
                 String rs = (((1000 * c.getRed()) / 255)) / 1000.0 + "";
                 String rg = (((1000 * c.getGreen()) / 255)) / 1000.0 + "";
                 String rb = (((1000 * c.getBlue()) / 255)) / 1000.0 + "";
-                String s = "/Color" + In.toString() + "{" + rs
+                String s = "/Color" + index + "{" + rs
                         + " " + rg + " " + rb
-                        + " " + "setrgbcolor" + "} " + " def " + "\n";
+                        + " setrgbcolor} def\n";
                 fp.write(s.getBytes());
             } else if (stype == 1) {
-                double gray = (0.11 * c.getRed() + 0.59 * c.getGreen() + 0.3 * c.getBlue()) / 255;
-                String s = "/Color" + In.toString() + "{" + gray
+                double gray = (0.11 * c.getRed() + 0.59 * c.getGreen() + 0.3 * c.getBlue()) / 255.0;
+                String s = "/Color" + index + "{" + gray
                         + " " + gray + " " + gray
-                        + " " + "setrgbcolor" + "} " + " def " + "\n";
+                        + " setrgbcolor} def\n";
                 fp.write(s.getBytes());
-
             } else if (stype == 2) {
-                String s = "/Color" + In.toString() + "{" + 0.0
-                        + " " + 0.0 + " " + 0.0
-                        + " " + "setrgbcolor" + "} " + " def " + "\n";
+                String s = "/Color" + index + "{0.0 0.0 0.0 setrgbcolor} def\n";
                 fp.write(s.getBytes());
             }
         }
 
-        for (int i = 0; i < vd.size(); i++) {
-            Integer In = (Integer) vd.get(i);
-            int index = In.intValue();
-            Double db = (Double) dd.dashlist.get(index);
-            int v = (int) (db.doubleValue());
+        for (Object item : vd) {
+            if (!(item instanceof Number)) {
+                continue;
+            }
+            int index = ((Number) item).intValue();
 
-            String s;
+            if (index < 0 || index >= dd.dashlist.size()) {
+                continue;
+            }
 
-            s = "/Dash" + In.toString() + " ";
-            if (v == 0)
-                s += " {[] 0 setdash} def" + "\n";
-            else
-                s += " {[" + db.toString()
-                        + " " + db.toString() + "] 0 " + "setdash" + "} def" + "\n";
+            Object dashObj = dd.dashlist.get(index);
+            double dbVal = (dashObj instanceof Number) ? ((Number) dashObj).doubleValue() : 0.0;
+            int v = (int) dbVal;
+
+            String s = "/Dash" + index + " ";
+            if (v == 0) {
+                s += " {[] 0 setdash} def\n";
+            } else {
+                s += " {[" + dbVal + " " + dbVal + "] 0 setdash} def\n";
+            }
             fp.write(s.getBytes());
         }
 
-        for (int i = 0; i < vw.size(); i++) {
-            Integer In = (Integer) vw.get(i);
-            int index = In.intValue();
-            Double db = (Double) dd.widthlist.get(index);
-            String s = "/Width" + In.toString() + " {" + db.toString() + " setlinewidth} def " + "\n";
+        for (Object item : vw) {
+            if (!(item instanceof Number)) {
+                continue;
+            }
+            int index = ((Number) item).intValue();
+
+            if (index < 0 || index >= dd.widthlist.size()) {
+                continue;
+            }
+
+            Object widthObj = dd.widthlist.get(index);
+            double widthVal = (widthObj instanceof Number) ? ((Number) widthObj).doubleValue() : 1.0;
+
+            String s = "/Width" + index + " {" + widthVal + " setlinewidth} def\n";
             fp.write(s.getBytes());
         }
     }

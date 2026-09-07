@@ -38,6 +38,11 @@ import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 
 import org.apache.commons.cli.*;
+import wprover.CheerpJIntegration.CheerpJIntegration;
+import wprover.CheerpJIntegration.OpenWebPage;
+import wprover.CheerpJIntegration.WebOpenFileDialog;
+import wprover.CheerpJIntegration.WebSaveFileDialog;
+
 
 /**
  * GExpert is the main class for the GEXPERT application.
@@ -114,6 +119,12 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * It also initializes various attributes and sets up the main content pane.
      */
     public void init() {
+        String env = CheerpJIntegration.isRunningInCheerpJ()
+                ? "CheerpJ WebAssembly (Browser)"
+                : "Native JVM (" + System.getProperty("java.version") + ")";
+        System.out.println("Running in: " + env);
+
+
         this.setIconImage(GExpert.createImageIcon("images/gexicon.gif").getImage());    //GAPPLET
         // setLocal();
         // showWelcome();
@@ -811,6 +822,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Populate a JMenu by scanning a folder on the classpath.
+     *
      * @param menu        the menu to fill
      * @param resourceDir the resource path (e.g. "docs/examples")
      */
@@ -849,8 +861,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                             // If one name starts with a number and the other doesn't, prioritize the one with number
                             else if (name1.matches("^\\d+.*")) {
                                 return -1;
-                            }
-                            else if (name2.matches("^\\d+.*")) {
+                            } else if (name2.matches("^\\d+.*")) {
                                 return 1;
                             }
 
@@ -865,10 +876,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 for (File f : files) {
                     handleEntry(menu, resourceDir, f.getName(), f.isDirectory());
                 }
-            if (files.length > 0) {
-                // we assume that at least one file was found
-                return; // so no further work is needed
-            }
+                if (files.length > 0) {
+                    // we assume that at least one file was found
+                    return; // so no further work is needed
+                }
             } catch (Exception ex) {
                 // Problem when getting URL.
             }
@@ -878,116 +889,114 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             try {
                 // Use JarFile approach to get all entries
                 try {
-                        URL jarUrl = cl.getResource(path);
-                        if (jarUrl != null) {
-                            String jarPath = jarUrl.toString();
-                            if (jarPath.startsWith("jar:file:")) {
-                                jarPath = jarPath.substring(9, jarPath.indexOf("!"));
-                                jarPath = jarPath.replace("%20", " "); // fix path
-                                try (JarFile jar = new JarFile(jarPath)) {
-                                    Enumeration<JarEntry> entries = jar.entries();
-                                    // first collect all entries to process
-                                    java.util.Map<String, Boolean> processedDirs = new java.util.HashMap<>();
-                                    java.util.List<String> filesToProcess = new java.util.ArrayList<String>();
+                    URL jarUrl = cl.getResource(path);
+                    if (jarUrl != null) {
+                        String jarPath = jarUrl.toString();
+                        if (jarPath.startsWith("jar:file:")) {
+                            jarPath = jarPath.substring(9, jarPath.indexOf("!"));
+                            jarPath = jarPath.replace("%20", " "); // fix path
+                            try (JarFile jar = new JarFile(jarPath)) {
+                                Enumeration<JarEntry> entries = jar.entries();
+                                // first collect all entries to process
+                                java.util.Map<String, Boolean> processedDirs = new java.util.HashMap<>();
+                                java.util.List<String> filesToProcess = new java.util.ArrayList<String>();
 
-                                    while (entries.hasMoreElements()) {
-                                        JarEntry entry = entries.nextElement();
-                                        String entryName = entry.getName();
+                                while (entries.hasMoreElements()) {
+                                    JarEntry entry = entries.nextElement();
+                                    String entryName = entry.getName();
 
-                                        if (entryName.startsWith(path)) {
-                                            String relativePath = entryName.substring(path.length());
-                                            if (relativePath.isEmpty()) continue;
+                                    if (entryName.startsWith(path)) {
+                                        String relativePath = entryName.substring(path.length());
+                                        if (relativePath.isEmpty()) continue;
 
-                                            int slashIndex = relativePath.indexOf('/');
-                                            if (slashIndex == -1) {
-                                                filesToProcess.add(relativePath);
-                                            } else {
-                                                // subdirectory
-                                                String dirName = relativePath.substring(0, slashIndex);
-                                                if (!processedDirs.containsKey(dirName)) {
-                                                    processedDirs.put(dirName, true);
-                                                }
+                                        int slashIndex = relativePath.indexOf('/');
+                                        if (slashIndex == -1) {
+                                            filesToProcess.add(relativePath);
+                                        } else {
+                                            // subdirectory
+                                            String dirName = relativePath.substring(0, slashIndex);
+                                            if (!processedDirs.containsKey(dirName)) {
+                                                processedDirs.put(dirName, true);
                                             }
                                         }
-                                    }
-
-                                    // Sort directories using custom comparator
-                                    java.util.List<String> dirNames = new java.util.ArrayList<>(processedDirs.keySet());
-                                    Collections.sort(dirNames, new Comparator<String>() {
-                                        @Override
-                                        public int compare(String name1, String name2) {
-                                            // Check if both names start with numbers
-                                            if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
-                                                // Extract the numeric prefix
-                                                String num1 = name1.replaceAll("^(\\d+).*", "$1");
-                                                String num2 = name2.replaceAll("^(\\d+).*", "$1");
-
-                                                // If numeric parts are different, compare them numerically
-                                                if (!num1.equals(num2)) {
-                                                    return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
-                                                }
-                                            }
-                                            // If one name starts with a number and the other doesn't, prioritize the one with number
-                                            else if (name1.matches("^\\d+.*")) {
-                                                return -1;
-                                            }
-                                            else if (name2.matches("^\\d+.*")) {
-                                                return 1;
-                                            }
-
-                                            // Otherwise, use alphabetical order
-                                            return name1.compareTo(name2);
-                                        }
-                                    });
-
-                                    // Process directories in sorted order
-                                    for (String dirName : dirNames) {
-                                        handleEntry(menu, resourceDir, dirName, true);
-                                    }
-
-                                    // Sort files using custom comparator
-                                    Collections.sort(filesToProcess, new Comparator<String>() {
-                                        @Override
-                                        public int compare(String name1, String name2) {
-                                            // Check if both names start with numbers
-                                            if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
-                                                // Extract the numeric prefix
-                                                String num1 = name1.replaceAll("^(\\d+).*", "$1");
-                                                String num2 = name2.replaceAll("^(\\d+).*", "$1");
-
-                                                // If numeric parts are different, compare them numerically
-                                                if (!num1.equals(num2)) {
-                                                    return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
-                                                }
-                                            }
-                                            // If one name starts with a number and the other doesn't, prioritize the one with number
-                                            else if (name1.matches("^\\d+.*")) {
-                                                return -1;
-                                            }
-                                            else if (name2.matches("^\\d+.*")) {
-                                                return 1;
-                                            }
-
-                                            // Otherwise, use alphabetical order
-                                            return name1.compareTo(name2);
-                                        }
-                                    });
-
-                                    // process all files in this directory
-                                    for (String fileName : filesToProcess) {
-                                        handleEntry(menu, resourceDir, fileName, false);
                                     }
                                 }
+
+                                // Sort directories using custom comparator
+                                java.util.List<String> dirNames = new java.util.ArrayList<>(processedDirs.keySet());
+                                Collections.sort(dirNames, new Comparator<String>() {
+                                    @Override
+                                    public int compare(String name1, String name2) {
+                                        // Check if both names start with numbers
+                                        if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
+                                            // Extract the numeric prefix
+                                            String num1 = name1.replaceAll("^(\\d+).*", "$1");
+                                            String num2 = name2.replaceAll("^(\\d+).*", "$1");
+
+                                            // If numeric parts are different, compare them numerically
+                                            if (!num1.equals(num2)) {
+                                                return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
+                                            }
+                                        }
+                                        // If one name starts with a number and the other doesn't, prioritize the one with number
+                                        else if (name1.matches("^\\d+.*")) {
+                                            return -1;
+                                        } else if (name2.matches("^\\d+.*")) {
+                                            return 1;
+                                        }
+
+                                        // Otherwise, use alphabetical order
+                                        return name1.compareTo(name2);
+                                    }
+                                });
+
+                                // Process directories in sorted order
+                                for (String dirName : dirNames) {
+                                    handleEntry(menu, resourceDir, dirName, true);
+                                }
+
+                                // Sort files using custom comparator
+                                Collections.sort(filesToProcess, new Comparator<String>() {
+                                    @Override
+                                    public int compare(String name1, String name2) {
+                                        // Check if both names start with numbers
+                                        if (name1.matches("^\\d+.*") && name2.matches("^\\d+.*")) {
+                                            // Extract the numeric prefix
+                                            String num1 = name1.replaceAll("^(\\d+).*", "$1");
+                                            String num2 = name2.replaceAll("^(\\d+).*", "$1");
+
+                                            // If numeric parts are different, compare them numerically
+                                            if (!num1.equals(num2)) {
+                                                return Integer.compare(Integer.parseInt(num1), Integer.parseInt(num2));
+                                            }
+                                        }
+                                        // If one name starts with a number and the other doesn't, prioritize the one with number
+                                        else if (name1.matches("^\\d+.*")) {
+                                            return -1;
+                                        } else if (name2.matches("^\\d+.*")) {
+                                            return 1;
+                                        }
+
+                                        // Otherwise, use alphabetical order
+                                        return name1.compareTo(name2);
+                                    }
+                                });
+
+                                // process all files in this directory
+                                for (String fileName : filesToProcess) {
+                                    handleEntry(menu, resourceDir, fileName, false);
+                                }
                             }
-                            return; // success
                         }
+                        return; // success
+                    }
 
                 } catch (Exception ex) {
                     // Error with file handling.
                 }
                 // 3. fallback to JarInputStream if jar-file protocol not available
                 try (InputStream is = cl.getResourceAsStream(path);
-                    JarInputStream jin = new JarInputStream(is)) {
+                     JarInputStream jin = new JarInputStream(is)) {
                     JarEntry e;
                     while ((e = jin.getNextJarEntry()) != null) {
                         String name = e.getName();
@@ -1029,7 +1038,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Adds the contents of the specified directory to the specified menu.
      *
-     * @param f the directory whose contents will be added
+     * @param f    the directory whose contents will be added
      * @param menu the menu to which the contents will be added
      * @param path the path of the directory
      */
@@ -1061,8 +1070,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                         // If one name starts with a number and the other doesn't, prioritize the one with number
                         else if (name1.matches("^\\d+.*")) {
                             return -1;
-                        }
-                        else if (name2.matches("^\\d+.*")) {
+                        } else if (name2.matches("^\\d+.*")) {
                             return 1;
                         }
 
@@ -1405,11 +1413,11 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a JRadioButtonMenuItem with the specified name, tooltip, action listener, and command.
      *
-     * @param bar the menu to add the item to
-     * @param name the display name and action command of the menu item
-     * @param tooltip the tooltip text to display
+     * @param bar      the menu to add the item to
+     * @param name     the display name and action command of the menu item
+     * @param tooltip  the tooltip text to display
      * @param listener the action listener to register on the menu item
-     * @param command the specific action command to set
+     * @param command  the specific action command to set
      * @return the created JRadioButtonMenuItem
      */
     public JRadioButtonMenuItem addRadioButtonMenuItem(JMenu bar, String name,
@@ -1423,10 +1431,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * Creates a JRadioButtonMenuItem with the specified name, custom text, tooltip, and action listener.
      * The menu item's text is set to its localized value.
      *
-     * @param bar the menu to add the item to
-     * @param name the internal name of the menu item used as its action command
-     * @param text the text to display on the menu item (to be localized)
-     * @param tooltip the tooltip text to display
+     * @param bar      the menu to add the item to
+     * @param name     the internal name of the menu item used as its action command
+     * @param text     the text to display on the menu item (to be localized)
+     * @param tooltip  the tooltip text to display
      * @param listener the action listener to register on the menu item
      * @return the created JRadioButtonMenuItem with localized text
      */
@@ -1442,9 +1450,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * The menu item's text and action command are set based on the provided name.
      * If the tooltip is null, a localized language tip may be used instead.
      *
-     * @param bar the menu to add the item to
-     * @param name the name used as the action command and display text of the menu item
-     * @param tooltip the tooltip text to display (or a localized tip if null)
+     * @param bar      the menu to add the item to
+     * @param name     the name used as the action command and display text of the menu item
+     * @param tooltip  the tooltip text to display (or a localized tip if null)
      * @param listener the action listener to register on the menu item
      * @return the created JRadioButtonMenuItem
      */
@@ -1472,10 +1480,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Adds a menu item to the specified menu bar with the given name, tooltip, mnemonic, and action listener.
      *
-     * @param bar the menu bar to which the menu item will be added
-     * @param name the name of the menu item
-     * @param tooltip the tooltip text for the menu item
-     * @param ne the mnemonic for the menu item
+     * @param bar      the menu bar to which the menu item will be added
+     * @param name     the name of the menu item
+     * @param tooltip  the tooltip text for the menu item
+     * @param ne       the mnemonic for the menu item
      * @param listener the action listener for the menu item
      * @return the created JMenuItem
      */
@@ -1523,9 +1531,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Adds a menu item to the specified menu bar with the given name, tooltip, and action listener.
      *
-     * @param bar the menu bar to which the menu item will be added
-     * @param name the name of the menu item
-     * @param tooltip the tooltip text for the menu item
+     * @param bar      the menu bar to which the menu item will be added
+     * @param name     the name of the menu item
+     * @param tooltip  the tooltip text for the menu item
      * @param listener the action listener for the menu item
      * @return the created JMenuItem
      */
@@ -1668,11 +1676,9 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * updating the UI state, and other application-specific functions.
      *
      * @param command the action command to be processed
-     * @param src the source object that triggered the command (e.g., JMenuItem, JToggleButton, or File)
+     * @param src     the source object that triggered the command (e.g., JMenuItem, JToggleButton, or File)
      */
     synchronized public void sendAction(String command, Object src) {
-
-
         String tip = null;
         String ps = null;
         String pname = null;
@@ -1699,49 +1705,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         if (command.equals("example")) {
             this.openResourceFile(pname);
         } else if (command.equals("Save as PS")) {
-            if (!need_save())
-                return;
-
-            DialogPsProperty dlg = new DialogPsProperty(this);
-            this.centerDialog(dlg);
-            dlg.setVisible(true);
-            int r = dlg.getSavePsType();
-            boolean ptf = dlg.getPointfilled();
-//            boolean pts = dlg.getisProveTextSaved();
-
-            if (r == 0 || r == 1 || r == 2) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setFileFilter(new FileFilter() {
-                    public boolean accept(File f) {
-                        return f.isDirectory() || f.getName().endsWith("ps");
-                    }
-
-                    public String getDescription() {
-                        return "PostScript (*.ps)";
-                    }
-                });
-                String dr = getUserDir();
-                chooser.setCurrentDirectory(new File(dr));
-
-                int result = chooser.showSaveDialog(this);
-                if (result == JFileChooser.CANCEL_OPTION) {
-                    return;
-                }
-                try {
-                    File file = chooser.getSelectedFile();
-                    String path = file.getPath();
-                    if (!path.endsWith(".ps")) {
-                        path += ".ps";
-                    }
-                    if (file.exists() && get_User_Overwrite_Option(file.getName())) {
-                        return;
-                    }
-                    dp.write_ps(path, r, ptf, true);
-                } catch (Exception ee) {
-                    CMisc.print(ee.toString() + "\n" + ee.getStackTrace());
-                }
-            }
-
+            this.saveAsPS();
         } else if (command.equalsIgnoreCase("Save as PDF")) {
             this.saveAsPDF();
         } else if (command.equals("Save as Image")) {
@@ -1751,107 +1715,23 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } else if (command.equalsIgnoreCase("Save Proof as Animated Image")) {
             this.saveProofAsGIF();
         } else if (command.equalsIgnoreCase("Prove")) {
-            if (((String) src).equalsIgnoreCase("gdd")) {
-                pprove.proveGdd(); // TODO: Add more provers
-                // Workaround: certain imported GGB conclusions may need
-                // a re-computation. FIXME
-                if (GExpert.conclusion != null)
-                    pprove.proveGdd();
-                GExpert.performCommandLineRequests(this, true);
-
-            } else {
-                pprove.prove();
-            }
+            this.prove((String)src);
         } else if (command.equalsIgnoreCase("Wait")) {
-            Integer secs = (Integer) src;
-            try {
-                wait(secs * 1000);
-            } catch (Exception e) {
-                // Dummy placeholder
-            }
-
-        } else if (command.equals("Save") || command.equals("Save as...")) {
-            if (command.equals("Save")) {
-                if (src instanceof File) {
-                    dp.setFile((File) src);
-                }
-                this.saveAFile(false);
-            } else this.saveAFile(true);
-
+            this.wait(src);
+        } else if (command.equals("Save")) {
+            this.save(src);
+        } else if (command.equals("Save as...")) {
+            this.saveAs();
         } else if (command.equalsIgnoreCase("Save GDD Proof as GraphViz File")) {
             this.saveGDDProofAsGraphViz(src);
         } else if (command.equalsIgnoreCase("Open GDD Proof in GraphViz Online")) {
             this.openGDDProofGraphVizOnline();
         } else if (command.equals("Save as Text")) {
-            if (!need_save())
-                return;
-
-            GTerm gt = pprove.getConstructionTerm();
-            if (gt != null) {
-                JFileChooser filechooser1 = new JFileChooser();
-                String dr = getUserDir();
-                filechooser1.setCurrentDirectory(new File(dr));
-
-                int result = filechooser1.showDialog(this, getLanguage("Save"));
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    File f = filechooser1.getSelectedFile();
-                    FileOutputStream fp;
-                    try {
-                        if (f.exists()) {
-                            f.delete();
-                            fp = new FileOutputStream(f, true);
-                            fp.write("\n\n".getBytes());
-                        } else {
-                            f.createNewFile();
-                            fp = new FileOutputStream(f, false);
-                        }
-                        if (fp == null) {
-                            return;
-                        }
-                        gt.writeAterm(fp);
-                        dp.writePointPosition(fp);
-                        fp.close();
-                    } catch (IOException ee) {
-                        JOptionPane.showMessageDialog(this, ee.getMessage(),
-                                "Save Error", JOptionPane.ERROR_MESSAGE);
-                    }
-
-                }
-
-            }
+            this.saveAsText();
         } else if (command.equals("Open")) {
-
-            if (src instanceof File) {
-                openAFile((File) src);
-            } else {
-
-                JFileChooser chooser = getFileChooser(false);
-                int result = chooser.showOpenDialog(this);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    try {
-                        File file = chooser.getSelectedFile();
-                        openAFile(file);
-                    } catch (Exception ee) {
-                        ee.printStackTrace();
-                    }
-                }
-            }
-            // Handle import of ggb file
+            this.open(src);
         } else if (command.equals("Import")) {
-            if (src instanceof File) {
-                openGGBFile((File) src);
-            } else {
-                JFileChooser chooser = getFileChooser(true);
-                int result = chooser.showOpenDialog(this);
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    try {
-                        File file = chooser.getSelectedFile();
-                        openGGBFile(file);
-                    } catch (Exception ee) {
-                        ee.printStackTrace();
-                    }
-                }
-            }
+            this.import_(src);
         } else if (command.equals("Exit")) {
             if (saveBeforeExit())
                 System.exit(0);
@@ -2214,10 +2094,141 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         }
     }
 
+    private void open(Object src){
+        if (src instanceof File) {
+            openAFile((File) src);
+        } else {
+            if (CheerpJIntegration.isRunningInCheerpJ()) {
+                WebOpenFileDialog chooser = new WebOpenFileDialog();
+
+                int result = chooser.showOpenDialog(this, new String[]{".gex"});
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openAFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            } else {
+                JFileChooser chooser = getFileChooser(false);
+
+                int result = chooser.showOpenDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openAFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private void import_(Object src){
+        if (src instanceof File) {
+            openGGBFile((File) src);
+        } else {
+            if (CheerpJIntegration.isRunningInCheerpJ()) {
+                WebOpenFileDialog chooser = new WebOpenFileDialog();
+
+                int result = chooser.showOpenDialog(this, new String[]{".ggb"});
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openGGBFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            } else {
+                JFileChooser chooser = getFileChooser(true);
+                int result = chooser.showOpenDialog(this);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    try {
+                        File file = chooser.getSelectedFile();
+                        openGGBFile(file);
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                    }
+                }
+            }
+        }
+    }
+
+    private void saveAsText() {
+        if (!need_save())
+            return;
+
+        GTerm gt = pprove.getConstructionTerm();
+        if (gt == null) {
+            return;
+        }
+
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
+
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".txt";
+            }
+
+            String filePath = "/files/" + fileName;
+
+            try {
+                FileOutputStream fp = new FileOutputStream(filePath, false);
+                fp.write("\n\n".getBytes());
+                gt.writeAterm(fp);
+                dp.writePointPosition(fp);
+                fp.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            } catch (IOException ee) {
+                JOptionPane.showMessageDialog(this, ee.getMessage(),
+                        "Failed to save as text: ", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            JFileChooser filechooser1 = new JFileChooser();
+            String dr = getUserDir();
+            filechooser1.setCurrentDirectory(new File(dr));
+
+            int result = filechooser1.showDialog(this, getLanguage("Save"));
+            if (result == JFileChooser.APPROVE_OPTION) {
+                File f = filechooser1.getSelectedFile();
+                FileOutputStream fp;
+                try {
+                    if (f.exists()) {
+                        f.delete();
+                        fp = new FileOutputStream(f, true);
+                        fp.write("\n\n".getBytes());
+                    } else {
+                        f.createNewFile();
+                        fp = new FileOutputStream(f, false);
+                    }
+                    if (fp == null) {
+                        return;
+                    }
+                    gt.writeAterm(fp);
+                    dp.writePointPosition(fp);
+                    fp.close();
+                } catch (IOException ee) {
+                    JOptionPane.showMessageDialog(this, ee.getMessage(),
+                            "Save Error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        }
+    }
+
     /**
      * Show a warning on saving file in an unsafe folder that will be removed after closing JGEX.
      * In a Flathub sandbox, this is an important message for the user because the OS
      * does not inform the user on saving a file in a temporary folder.
+     *
      * @param file The user wants to use as the saved file.
      */
     private void showWarningUnsafeFolder(File file) {
@@ -2243,39 +2254,64 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * @param src the source object, which can be a File or another object
      */
     private void saveGDDProofAsGraphViz(Object src) {
-        File ff;
-        if (src instanceof File) {
-            ff = (File) src;
-        } else {
-            JFileChooser chooser = new JFileChooser();
-            chooser.setFileFilter(new JFileFilter("gv"));
-
-            String dr1 = getUserDir();
-            chooser.setCurrentDirectory(new File(dr1));
-
-            int result = chooser.showSaveDialog(this);
-            if (result == JFileChooser.CANCEL_OPTION) {
-                return;
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
             }
-            String dr = getUserDir();
-            chooser.setCurrentDirectory(new File(dr));
 
-            ff = chooser.getSelectedFile();
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".gv";
+            }
+
+            String filePath = "/files/" + fileName;
+
+            try {
+                Path path = Paths.get(filePath);
+                String program = PanelProve.graphvizProgram;
+                Files.write(path, java.util.List.of(program.split("\n")), StandardCharsets.UTF_8);
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+        } else {
+            File ff;
+            if (src instanceof File) {
+                ff = (File) src;
+            } else {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setFileFilter(new JFileFilter("gv"));
+
+                String dr1 = getUserDir();
+                chooser.setCurrentDirectory(new File(dr1));
+
+                int result = chooser.showSaveDialog(this);
+                if (result == JFileChooser.CANCEL_OPTION) {
+                    return;
+                }
+                String dr = getUserDir();
+                chooser.setCurrentDirectory(new File(dr));
+
+                ff = chooser.getSelectedFile();
+            }
+            String p = ff.getPath();
+            if (!p.endsWith("gv") && !p.endsWith("GV")) {
+                p = p + ".gv";
+                ff = new File(p);
+            }
+            try {
+                DataOutputStream out = dp.openOutputFile(ff.getPath()); // do we even need this?
+                Path path = Paths.get(ff.getPath());
+                String program = PanelProve.graphvizProgram;
+                Files.write(path, java.util.List.of(program.split("\n")), StandardCharsets.UTF_8);
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+            showWarningUnsafeFolder(ff);
         }
-        String p = ff.getPath();
-        if (!p.endsWith("gv") && !p.endsWith("GV")) {
-            p = p + ".gv";
-            ff = new File(p);
-        }
-        try {
-            DataOutputStream out = dp.openOutputFile(ff.getPath());
-            Path path = Paths.get(ff.getPath());
-            String program = PanelProve.graphvizProgram;
-            Files.write(path, java.util.List.of(program.split("\n")), StandardCharsets.UTF_8);
-        } catch (Exception ee) {
-            ee.printStackTrace();
-        }
-        showWarningUnsafeFolder(ff);
     }
 
     /**
@@ -2424,50 +2460,64 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      * @return true if the file was saved successfully, false otherwise
      */
     public boolean saveAFile(boolean n) {
-        File file = dp.getFile();
-        int result = 0;
-
-        if (need_save()) {
-            if (file == null || n) { // command.equals("Save as...")
-                JFileChooser chooser = this.getFileChooser(false);
-
-                try {
-                    if (file != null && file.exists())
-                        chooser.setSelectedFile(file);
-                    result = chooser.showSaveDialog(this);
-                } catch (Exception ee) {
-                    filechooser = null;
-                    chooser = this.getFileChooser(false);
-                    result = chooser.showSaveDialog(this);
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            try {
+                String fileName = dp.getName();
+                if(fileName == null || fileName.strip().isEmpty()){
+                    fileName = "unnamed.gex";
                 }
 
-                if (result == JFileChooser.APPROVE_OPTION) {
-                    file = chooser.getSelectedFile();
-                } else
-                    file = null;
+                saveAFileCheerpJ(fileName);
+            } catch (IOException e) {
+                System.err.println("Failed to save file for web download. " + e.toString());
             }
-            if (file != null)
-                try {
-                    showWarningUnsafeFolder(file);
-                    String path = file.getPath();
-                    if (!path.endsWith(".gex")) {
-                        path += ".gex";
-                    }
-                    File f = new File(path);
-                    if (f.exists() && get_User_Overwrite_Option(file.getName())) {
-                        return false;
-                    }
-                    saveAFile(path);
-                    updateTitle();
-                    CMisc.onFileSavedOrLoaded();
-                    return true;
+            return true;
+        } else {
+            File file = dp.getFile();
+            int result = 0;
 
-                } catch (Exception ee) {
-                    ee.printStackTrace();
-                    CMisc.print(ee.getMessage() + "\n" + ee.getStackTrace());
+            if (need_save()) {
+                if (file == null || n) { // command.equals("Save as...")
+                    JFileChooser chooser = this.getFileChooser(false);
+
+                    try {
+                        if (file != null && file.exists())
+                            chooser.setSelectedFile(file);
+                        result = chooser.showSaveDialog(this);
+                    } catch (Exception ee) {
+                        filechooser = null;
+                        chooser = this.getFileChooser(false);
+                        result = chooser.showSaveDialog(this);
+                    }
+
+                    if (result == JFileChooser.APPROVE_OPTION) {
+                        file = chooser.getSelectedFile();
+                    } else
+                        file = null;
                 }
+                if (file != null)
+                    try {
+                        showWarningUnsafeFolder(file);
+                        String path = file.getPath();
+                        if (!path.endsWith(".gex")) {
+                            path += ".gex";
+                        }
+                        File f = new File(path);
+                        if (f.exists() && get_User_Overwrite_Option(file.getName())) {
+                            return false;
+                        }
+                        saveAFile(path);
+                        updateTitle();
+                        CMisc.onFileSavedOrLoaded();
+                        return true;
+
+                    } catch (Exception ee) {
+                        ee.printStackTrace();
+                        CMisc.print(ee.getMessage() + "\n" + ee.getStackTrace());
+                    }
+            }
+            return false;
         }
-        return false;
     }
 
     /**
@@ -2576,6 +2626,20 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         out.close();
     }
 
+    public void saveAFileCheerpJ(String fileName) throws IOException {
+        if(!fileName.endsWith(".gex")){
+            fileName+=".gex";
+        }
+        String filePath = "/files/"+fileName;
+
+        DataOutputStream out = dp.openOutputFile(filePath);
+        dp.Save(out);
+        pprove.SaveProve(out);
+        out.close();
+
+        WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+    }
+
     /**
      * Saves the proof as a GIF image.
      * Opens dialogs to select the region and file destination, then encodes the proof into a GIF.
@@ -2594,50 +2658,88 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         Rectangle rc = r1.getRectangle();
 
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new JFileFilter("GIF"));
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
 
-        String dr1 = getUserDir();
-        chooser.setCurrentDirectory(new File(dr1));
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".gif";
+            }
 
-        int result = chooser.showSaveDialog(this);
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return;
+            String filePath = "/files/" + fileName;
+//            File file = new File(filePath);
+
+            try {
+                DataOutputStream out = dp.openOutputFile(filePath);
+                GifEncoder e = new GifEncoder();
+                e.setQuality(20);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(200);   // 1 frame per sec
+
+                ImageTimer t = new ImageTimer(this);
+                t.setEncorder(e);
+                t.setRectangle(rc);
+
+                t.setProveBar(provePanelbar);
+                t.setDelay(200);
+                t.setVisible(true);
+                e.finish();
+                out.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
+
+        }else{
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new JFileFilter("GIF"));
+
+            String dr1 = getUserDir();
+            chooser.setCurrentDirectory(new File(dr1));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            File ff = chooser.getSelectedFile();
+            showWarningUnsafeFolder(ff);
+
+            String p = ff.getPath();
+            if (!p.endsWith("gif") && !p.endsWith("GIF")) {
+                p = p + ".gif";
+                ff = new File(p);
+            }
+            try {
+                DataOutputStream out = dp.openOutputFile(ff.getPath());
+                GifEncoder e = new GifEncoder();
+                e.setQuality(20);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(200);   // 1 frame per sec
+
+                ImageTimer t = new ImageTimer(this);
+                t.setEncorder(e);
+                t.setRectangle(rc);
+
+                t.setProveBar(provePanelbar);
+                t.setDelay(200);
+                t.setVisible(true);
+                e.finish();
+                out.close();
+
+            } catch (Exception ee) {
+                ee.printStackTrace();
+            }
         }
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
-
-        File ff = chooser.getSelectedFile();
-        showWarningUnsafeFolder(ff);
-
-        String p = ff.getPath();
-        if (!p.endsWith("gif") && !p.endsWith("GIF")) {
-            p = p + ".gif";
-            ff = new File(p);
-        }
-        try {
-            DataOutputStream out = dp.openOutputFile(ff.getPath());
-            GifEncoder e = new GifEncoder();
-            e.setQuality(20);
-            e.start(out);
-            e.setRepeat(0);
-            e.setDelay(200);   // 1 frame per sec
-
-            ImageTimer t = new ImageTimer(this);
-            t.setEncorder(e);
-            t.setRectangle(rc);
-
-            t.setProveBar(provePanelbar);
-            t.setDelay(200);
-            t.setVisible(true);
-            e.finish();
-            out.close();
-
-        } catch (Exception ee) {
-            ee.printStackTrace();
-        }
-
-
     }
 
     /**
@@ -2648,6 +2750,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
         if (!need_save())
             return;
+
         AnimateC am = dp.getAnimateC();
         if (am == null) {
             JOptionPane.showMessageDialog(this, getLanguage("No animation has been defined.") + "\n"
@@ -2672,54 +2775,116 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         } else
             return;
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new JFileFilter("GIF"));
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
 
-        int result = chooser.showSaveDialog(this);
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return;
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".gif";
+            }
+
+            String filePath = "/files/" + fileName;
+            File file = new File(filePath);
+
+            am.reCalculate();
+            int n = am.getRounds();
+            if (n == 0) return;
+
+            int v = 1000 / am.getInitValue();
+
+            GIFProcessDialog dlg1 = new GIFProcessDialog(this.getFrame());
+            this.centerDialog(dlg1);
+            dlg1.setTotal(n);
+
+            int k = 0;
+
+            try {
+                DataOutputStream out = dp.openOutputFile(file.getPath());
+                GifEncoder e = new GifEncoder();
+                e.setQuality(q);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(v);   // 1 frame per sec
+                dlg1.en = e;
+                dlg1.dp = dp;
+                dlg1.rect = rect;
+                dlg1.am = am;
+                dlg1.gxInstance = this;
+                dlg1.out = out;
+                dlg1.setVisible(true);
+                dlg1.setRun();
+
+                // Not sure why is this commented out. Keeping it just in case.
+//            while (n >= 0) {
+//                am.onTimer();
+//                if (!dp.reCalculate()) {
+//                    am.resetXY();
+//                }
+//                e.addFrame(this.getBufferedImage(rect));
+//                n--;
+//            }
+//            e.finish();
+//            out.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+
+            } catch (IOException ee) {
+                System.out.println(ee.getMessage());
+            }
         }
+        else{
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new JFileFilter("GIF"));
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
 
 
-        File ff = chooser.getSelectedFile();
-        showWarningUnsafeFolder(ff);
+            File ff = chooser.getSelectedFile();
+            showWarningUnsafeFolder(ff);
 
-        String p = ff.getPath();
-        if (!p.endsWith("gif") && !p.endsWith("GIF")) {
-            p = p + ".gif";
-            ff = new File(p);
-        }
+            String p = ff.getPath();
+            if (!p.endsWith("gif") && !p.endsWith("GIF")) {
+                p = p + ".gif";
+                ff = new File(p);
+            }
 
 
-        am.reCalculate();
-        int n = am.getRounds();
-        if (n == 0) return;
+            am.reCalculate();
+            int n = am.getRounds();
+            if (n == 0) return;
 
-        int v = 1000 / am.getInitValue();
+            int v = 1000 / am.getInitValue();
 
-        GIFProcessDialog dlg1 = new GIFProcessDialog(this.getFrame());
-        this.centerDialog(dlg1);
-        dlg1.setTotal(n);
+            GIFProcessDialog dlg1 = new GIFProcessDialog(this.getFrame());
+            this.centerDialog(dlg1);
+            dlg1.setTotal(n);
 
-        int k = 0;
+            int k = 0;
 
-        try {
-            DataOutputStream out = dp.openOutputFile(ff.getPath());
-            GifEncoder e = new GifEncoder();
-            e.setQuality(q);
-            e.start(out);
-            e.setRepeat(0);
-            e.setDelay(v);   // 1 frame per sec
-            dlg1.en = e;
-            dlg1.dp = dp;
-            dlg1.rect = rect;
-            dlg1.am = am;
-            dlg1.gxInstance = this;
-            dlg1.out = out;
-            dlg1.setVisible(true);
-            dlg1.setRun();
+            try {
+                DataOutputStream out = dp.openOutputFile(ff.getPath());
+                GifEncoder e = new GifEncoder();
+                e.setQuality(q);
+                e.start(out);
+                e.setRepeat(0);
+                e.setDelay(v);   // 1 frame per sec
+                dlg1.en = e;
+                dlg1.dp = dp;
+                dlg1.rect = rect;
+                dlg1.am = am;
+                dlg1.gxInstance = this;
+                dlg1.out = out;
+                dlg1.setVisible(true);
+                dlg1.setRun();
 
 //            while (n >= 0) {
 //                am.onTimer();
@@ -2732,11 +2897,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 //            e.finish();
 //            out.close();
 
-        } catch (IOException ee) {
-            System.out.println(ee.getMessage());
+            } catch (IOException ee) {
+                System.out.println(ee.getMessage());
+            }
         }
-
-
     }
 
     /**
@@ -2748,81 +2912,33 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         if (!need_save())
             return;
 
-        Rectangle rect = null;
-        RectChooser rchoose = new RectChooser(this);
-        if (rchoose.getReturnResult()) {
-            rect = rchoose.getSelectedRectangle();
-        } else
-            return;
-
-        JFileChooser chooser = new JFileChooser();
-        String[] s = ImageIO.getWriterFormatNames();
-        String[] s1 = new String[s.length + 1];
-        for (int i = 0; i < s.length; i++)
-            s1[i] = s[i];
-        s1[s.length] = "gif";
-        s = s1;
-
-        if (s.length > 0) {
-            FileFilter t = chooser.getFileFilter();
-            chooser.removeChoosableFileFilter(t);
-
-            JFileFilter selected = null;
-            for (int i = 0; i < s.length; i++) {
-                JFileFilter f = new JFileFilter(s[i]);
-                chooser.addChoosableFileFilter(f);
-
-                if (s[i].equalsIgnoreCase("JPG"))
-                    selected = f;
-                if (selected == null && s[i].equalsIgnoreCase("JPEG"))
-                    selected = f;
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
             }
-            chooser.setFileFilter(selected);
-        }
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
 
-        int result = chooser.showSaveDialog(this);
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return;
-        }
-
-        File ff = chooser.getSelectedFile();
-        showWarningUnsafeFolder(ff);
-
-        FileFilter f = chooser.getFileFilter();
-        String endfix = f.getDescription();
-        if (endfix == null)
-            return;
-
-        String p = ff.getPath();
-        if (!p.endsWith(endfix)) {
-            p = p + "." + endfix;
-            ff = new File(p);
-        }
-
-        if (endfix.equals("gif")) {
-            try {
-                DataOutputStream out = dp.openOutputFile(ff.getPath());
-                GifEncoder e = new GifEncoder();
-                e.setQuality(1);
-                e.start(out);
-                e.setRepeat(0);
-                e.setDelay(0);
-                e.addFrame(this.getBufferedImage(rect));
-                e.finish();
-                out.close();
-            } catch (IOException ee) {
-                if (CMisc.isDebug())
-                    ee.printStackTrace();
-                else JOptionPane.showMessageDialog(this, ee.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".png";
             }
-        } else {
+
+            String filePath = "/files/" + fileName;
+            File file = new File(filePath);
+
+            Rectangle rect = null;
+            RectChooser rchoose = new RectChooser(this);
+            if (rchoose.getReturnResult()) {
+                rect = rchoose.getSelectedRectangle();
+            } else
+                return;
+
             BufferedImage image = getBufferedImage(rect);
-            Iterator iter = ImageIO.getImageWritersByFormatName(endfix);
+            Iterator iter = ImageIO.getImageWritersByFormatName("png");
             ImageWriter writer = (ImageWriter) iter.next();
             try {
-                ImageOutputStream imageOut = ImageIO.createImageOutputStream(ff);
+                ImageOutputStream imageOut = ImageIO.createImageOutputStream(file);
                 writer.setOutput(imageOut);
 
                 writer.write(new IIOImage(image, null, null));
@@ -2830,14 +2946,137 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
                 if (writer.canInsertImage(0))
                     writer.writeInsert(0, iioImage, null);
                 imageOut.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
             } catch (IOException exception) {
-                if (CMisc.isDebug())
-                    exception.printStackTrace();
-                else
-                    JOptionPane.showMessageDialog(this, exception.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, exception.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+            }
+        } else {
+            Rectangle rect = null;
+            RectChooser rchoose = new RectChooser(this);
+            if (rchoose.getReturnResult()) {
+                rect = rchoose.getSelectedRectangle();
+            } else
+                return;
+
+            JFileChooser chooser = new JFileChooser();
+            String[] s = ImageIO.getWriterFormatNames();
+            String[] s1 = new String[s.length + 1];
+            for (int i = 0; i < s.length; i++)
+                s1[i] = s[i];
+            s1[s.length] = "gif";
+            s = s1;
+
+            if (s.length > 0) {
+                FileFilter t = chooser.getFileFilter();
+                chooser.removeChoosableFileFilter(t);
+
+                JFileFilter selected = null;
+                for (int i = 0; i < s.length; i++) {
+                    JFileFilter f = new JFileFilter(s[i]);
+                    chooser.addChoosableFileFilter(f);
+
+                    if (s[i].equalsIgnoreCase("JPG"))
+                        selected = f;
+                    if (selected == null && s[i].equalsIgnoreCase("JPEG"))
+                        selected = f;
+                }
+                chooser.setFileFilter(selected);
+            }
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
+
+            File ff = chooser.getSelectedFile();
+            showWarningUnsafeFolder(ff);
+
+            FileFilter f = chooser.getFileFilter();
+            String endfix = f.getDescription();
+            if (endfix == null)
+                return;
+
+            String p = ff.getPath();
+            if (!p.endsWith(endfix)) {
+                p = p + "." + endfix;
+                ff = new File(p);
+            }
+
+            if (endfix.equals("gif")) {
+                try {
+                    DataOutputStream out = dp.openOutputFile(ff.getPath());
+                    GifEncoder e = new GifEncoder();
+                    e.setQuality(1);
+                    e.start(out);
+                    e.setRepeat(0);
+                    e.setDelay(0);
+                    e.addFrame(this.getBufferedImage(rect));
+                    e.finish();
+                    out.close();
+                } catch (IOException ee) {
+                    if (CMisc.isDebug())
+                        ee.printStackTrace();
+                    else JOptionPane.showMessageDialog(this, ee.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                BufferedImage image = getBufferedImage(rect);
+                Iterator iter = ImageIO.getImageWritersByFormatName(endfix);
+                ImageWriter writer = (ImageWriter) iter.next();
+                try {
+                    ImageOutputStream imageOut = ImageIO.createImageOutputStream(ff);
+                    writer.setOutput(imageOut);
+
+                    writer.write(new IIOImage(image, null, null));
+                    IIOImage iioImage = new IIOImage(image, null, null);
+                    if (writer.canInsertImage(0))
+                        writer.writeInsert(0, iioImage, null);
+                    imageOut.close();
+                } catch (IOException exception) {
+                    if (CMisc.isDebug())
+                        exception.printStackTrace();
+                    else
+                        JOptionPane.showMessageDialog(this, exception.getMessage(), "Information", JOptionPane.ERROR_MESSAGE);
+                }
             }
         }
+    }
 
+
+    private void prove(String src){
+        if (src.equalsIgnoreCase("gdd")) {
+            pprove.proveGdd(); // TODO: Add more provers
+            // Workaround: certain imported GGB conclusions may need
+            // a re-computation. FIXME
+            if (GExpert.conclusion != null)
+                pprove.proveGdd();
+            GExpert.performCommandLineRequests(this, true);
+
+        } else {
+            pprove.prove();
+        }
+    }
+
+    private void wait(Object src){
+        Integer secs = (Integer) src;
+        try {
+            wait(secs * 1000);
+        } catch (Exception e) {
+            // Dummy placeholder
+        }
+    }
+
+    private void save(Object src){
+        if (src instanceof File) {
+            dp.setFile((File) src);
+        }
+        this.saveAFile(false);
+    }
+
+    private void saveAs(){
+        this.saveAFile(true);
     }
 
     /**
@@ -2942,7 +3181,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Opens and loads a project file from a resource path.
-     * 
+     *
      * @param resourcePath the path of the resource to open
      * @return true if the file was successfully loaded, false otherwise
      */
@@ -3237,11 +3476,11 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a toggle button with the specified image, action command, tooltip text, alternate text, and an optional action listener.
      *
-     * @param imageName the name of the image file (without extension) to be used as the button icon
+     * @param imageName     the name of the image file (without extension) to be used as the button icon
      * @param actionCommand the action command to be set for the button
-     * @param toolTipText the tooltip text to be displayed when the mouse hovers over the button
-     * @param altText the alternate text to be used if the image cannot be found
-     * @param t a boolean indicating whether to add an action listener to the button
+     * @param toolTipText   the tooltip text to be displayed when the mouse hovers over the button
+     * @param altText       the alternate text to be used if the image cannot be found
+     * @param t             a boolean indicating whether to add an action listener to the button
      * @return the created JToggleButton
      */
     protected JToggleButton makeAButton(String imageName,
@@ -3259,10 +3498,10 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a toggle button with the specified image, action command, tooltip text, and alternate text.
      *
-     * @param imageName the name of the image file (without extension) to be used as the button icon
+     * @param imageName     the name of the image file (without extension) to be used as the button icon
      * @param actionCommand the action command to be set for the button
-     * @param toolTipText the tooltip text to be displayed when the mouse hovers over the button
-     * @param altText the alternate text to be used if the image cannot be found
+     * @param toolTipText   the tooltip text to be displayed when the mouse hovers over the button
+     * @param altText       the alternate text to be used if the image cannot be found
      * @return the created JToggleButton
      */
     protected JToggleButton makeAButton(String imageName,
@@ -3309,11 +3548,11 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     /**
      * Creates a toggle button with two icons, one for the default state and one for the selected state.
      *
-     * @param imageName the name of the image file (without extension) to be used as the button icon in the default state
+     * @param imageName         the name of the image file (without extension) to be used as the button icon in the default state
      * @param imageNameSelected the name of the image file (without extension) to be used as the button icon in the selected state
-     * @param actionCommand the action command to be set for the button
-     * @param toolTipText the tooltip text to be displayed when the mouse hovers over the button
-     * @param altText the alternate text to be used if the image cannot be found
+     * @param actionCommand     the action command to be set for the button
+     * @param toolTipText       the tooltip text to be displayed when the mouse hovers over the button
+     * @param altText           the alternate text to be used if the image cannot be found
      * @return the created DActionButton with two status icons
      */
     protected JToggleButton makeAButtonWith2ICon(String imageName,
@@ -3707,6 +3946,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Create an ImageIcon from the path.
+     *
      * @param path the path to the image
      * @return the ImageIcon
      */
@@ -3720,6 +3960,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
 
     /**
      * Get the resource URL from the path.
+     *
      * @param path the path to the resource
      * @return the URL of the resource
      */
@@ -3740,13 +3981,18 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         frame.pack();
 
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int frameWidth = 1000;
-        int frameHeight = 700;
-        frame.setSize(frameWidth, frameHeight);
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
+            frame.setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+        } else {
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            int frameWidth = 1000;
+            int frameHeight = 700;
+            frame.setSize(frameWidth, frameHeight);
 
-        frame.setLocation((int) (screenSize.getWidth() - frameWidth) / 2,
-                (int) (screenSize.getHeight() - frameHeight) / 2); //center
+            frame.setLocation((int) (screenSize.getWidth() - frameWidth) / 2,
+                    (int) (screenSize.getHeight() - frameHeight) / 2); //center
+        }
+
         frame.setVisible(true);
 
         // In case there were command line requests, let us do them:
@@ -3886,6 +4132,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     // TODO START CONVERTING HERE, this is the main method
+
     /**
      * Main entry point of the application.
      * Processes command line options and initializes the GUI.
@@ -3904,34 +4151,6 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     /**
-     * Checks if the application is running in a JAR file (including CheerpJ web environment).
-     *
-     * @return true if running from a JAR file, false otherwise.
-     */
-    public static boolean isRunningFromJar() {
-        URL resource = GExpert.class.getResource("/wprover/GExpert.class");
-        return resource != null && resource.toString().startsWith("jar:");
-    }
-
-    /**
-     * Checks if the application is running in a CheerpJ web environment.
-     * 
-     * @return true if likely running in CheerpJ, false otherwise.
-     */
-    public static boolean isRunningInCheerpJ() {
-        // check if running in a browser environment (CheerpJ)
-        try {
-            // cheerpJ sets this property
-            return System.getProperty("java.vm.name", "").contains("CheerpJ") || 
-                   // alternative detection method
-                   (isRunningFromJar() && System.getProperty("browser", "false").equals("true"));
-        } catch (Exception e) {
-            // if we can't determine, assume not in CheerpJ
-            return false;
-        }
-    }
-
-    /**
      * Opens the specified URL in the system's default web browser or handles it appropriately
      * for the current environment (desktop or web/CheerpJ).
      *
@@ -3939,32 +4158,19 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
      */
     public static void openURL(String url) {
         // check if we're running in CheerpJ/web environment
-        if (isRunningInCheerpJ()) {
+        if (CheerpJIntegration.isRunningInCheerpJ()) {
             try {
-                // for file:/// URLs in CheerpJ, we need to handle them differently
-                if (url.startsWith("file:///")) {
-                    // FIXME: This does not work at the moment.
-                    // convert file:/// URL to a relative path for resource loading
-                    String relativePath = url.substring(url.indexOf("/help/"));
+                String targetUrl = url;
 
-                    // in CheerpJ, we can use JavaScript to open the URL in a new tab/window
-                    // this requires the resources to be available at the relative path from the web root
-                    String jsCode = "window.open('" + relativePath + "', '_blank');";
-
-                    // execute JavaScript via CheerpJ's JavaScript bridge
-                    Class<?> jsClass = Class.forName("com.leaningtech.client.Global");
-                    Method evalMethod = jsClass.getMethod("eval", String.class);
-                    evalMethod.invoke(null, jsCode);
-                    return;
+                // help is expected to be avialable on the webserver hosting jgex/CheerpJ
+                final String PREFIX = "file:////files//";
+                if(targetUrl.startsWith(PREFIX)){
+                    targetUrl = targetUrl.substring(PREFIX.length());
                 }
 
-                // for regular URLs (http, https), use JavaScript to open them
-                String command = "xdg-open " + url;
-                Runtime.getRuntime().exec(command);
+                OpenWebPage.openWebPageJs(targetUrl);
             } catch (Exception e) {
-                // fallback to showing a message with the URL if JavaScript bridge fails
-                JOptionPane.showMessageDialog(null, 
-                    GExpert.getTranslationViaGettext("Please open this URL in your browser: {0}", url));
+                e.printStackTrace();
             }
         } else {
             // original desktop behavior
@@ -4002,6 +4208,81 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
     }
 
     /**
+     * Saves the current view as a PostScript file.
+     * Prompts the user to choose a file and generates the PS output.
+     */
+    private void saveAsPS(){
+        if (!need_save())
+            return;
+
+        DialogPsProperty dlg = new DialogPsProperty(this);
+        this.centerDialog(dlg);
+        dlg.setVisible(true);
+        int r = dlg.getSavePsType();
+        boolean ptf = dlg.getPointfilled();
+//            boolean pts = dlg.getisProveTextSaved();
+
+        if (r < 0 || r > 2){
+            return;
+        }
+
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
+            }
+
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".ps";
+            }
+
+            String filePath = "/files/" + fileName;
+
+            try {
+                dp.write_ps(filePath, r, ptf, true);
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+            }
+            catch (Exception e){
+                System.err.println("Failed to save as PS: " + e);
+            }
+        }
+        else  {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileFilter() {
+                public boolean accept(File f) {
+                    return f.isDirectory() || f.getName().endsWith("ps");
+                }
+
+                public String getDescription() {
+                    return "PostScript (*.ps)";
+                }
+            });
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+
+            int result = chooser.showSaveDialog(this);
+            if (result == JFileChooser.CANCEL_OPTION) {
+                return;
+            }
+            try {
+                File file = chooser.getSelectedFile();
+                String path = file.getPath();
+                if (!path.endsWith(".ps")) {
+                    path += ".ps";
+                }
+                if (file.exists() && get_User_Overwrite_Option(file.getName())) {
+                    return;
+                }
+                dp.write_ps(path, r, ptf, true);
+            } catch (Exception ee) {
+                CMisc.print(ee.toString() + "\n" + ee.getStackTrace());
+            }
+        }
+    }
+
+    /**
      * Saves the current view as a PDF file.
      * Prompts the user to choose a file and generates the PDF output.
      */
@@ -4009,58 +4290,93 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
         if (!need_save())
             return;
 
-        JFileChooser chooser = new JFileChooser();
-        chooser.setFileFilter(new FileFilter() {
-            public boolean accept(File f) {
-                if (f.isDirectory())
-                    return true;
-
-                String s = f.getName();
-                if (s.endsWith("pdf") || s.endsWith("PDF"))
-                    return true;
-                return false;
+        if(CheerpJIntegration.isRunningInCheerpJ()){
+            String fileName = dp.getName();
+            if (fileName == null || fileName.strip().isEmpty()) {
+                // using .gex for consistency, because dp.getName() returns .gex
+                fileName = "unnamed.gex";
             }
 
-            public String getDescription() {
-                return "Adobe PDF File (*.pdf)";
-            }
-        });
-        String dr = getUserDir();
-        chooser.setCurrentDirectory(new File(dr));
-        int n = chooser.showOpenDialog(this);
-        if (n != JFileChooser.OPEN_DIALOG)
-            return;
-
-        try {
-            File file = chooser.getSelectedFile();
-            String path = file.getPath();
-            if (path.endsWith("PDF") || path.endsWith("pdf")) {
-            } else {
-                file = new File(path + ".pdf");
-            }
-            if (file.exists()) {
-                int n2 = JOptionPane.showConfirmDialog(this,
-                        getTranslationViaGettext("{0} already exists, do you want to overwrite it?", file.getName()),
-                        "File Exists", JOptionPane.YES_NO_CANCEL_OPTION);
-                if (n2 != JOptionPane.YES_OPTION) {
-                    return;
-                }
+            if (fileName.endsWith(".gex")) {
+                fileName = fileName.substring(0, fileName.length() - 4);
+                fileName += ".pdf";
             }
 
-            FileOutputStream fileOutputStream = new FileOutputStream(file);
+            String filePath = "/files/" + fileName;
+
+            try {
+                File file = new File(filePath);
+
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
 
 
-            Graphics pdfGraphics = null;
-            PDFJob job = new PDFJob(fileOutputStream);
-            pdfGraphics = job.getGraphics();
-            d.paintAll(pdfGraphics);
-            pdfGraphics.dispose();
-            job.end();
-            fileOutputStream.close();
-        } catch (IOException ee) {
-            JOptionPane.showMessageDialog(this, ee.getMessage());
+                Graphics pdfGraphics = null;
+                PDFJob job = new PDFJob(fileOutputStream);
+                pdfGraphics = job.getGraphics();
+                d.paintAll(pdfGraphics);
+                pdfGraphics.dispose();
+                job.end();
+                fileOutputStream.close();
+
+                WebSaveFileDialog.showSaveDialog(this, filePath, fileName);
+
+            } catch (IOException ee) {
+                JOptionPane.showMessageDialog(this, ee.getMessage());
+            }
         }
+        else{
+            JFileChooser chooser = new JFileChooser();
+            chooser.setFileFilter(new FileFilter() {
+                public boolean accept(File f) {
+                    if (f.isDirectory())
+                        return true;
 
+                    String s = f.getName();
+                    if (s.endsWith("pdf") || s.endsWith("PDF"))
+                        return true;
+                    return false;
+                }
+
+                public String getDescription() {
+                    return "Adobe PDF File (*.pdf)";
+                }
+            });
+            String dr = getUserDir();
+            chooser.setCurrentDirectory(new File(dr));
+            int n = chooser.showOpenDialog(this);
+            if (n != JFileChooser.OPEN_DIALOG)
+                return;
+
+            try {
+                File file = chooser.getSelectedFile();
+                String path = file.getPath();
+                if (path.endsWith("PDF") || path.endsWith("pdf")) {
+                } else {
+                    file = new File(path + ".pdf");
+                }
+                if (file.exists()) {
+                    int n2 = JOptionPane.showConfirmDialog(this,
+                            getTranslationViaGettext("{0} already exists, do you want to overwrite it?", file.getName()),
+                            "File Exists", JOptionPane.YES_NO_CANCEL_OPTION);
+                    if (n2 != JOptionPane.YES_OPTION) {
+                        return;
+                    }
+                }
+
+                FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+
+                Graphics pdfGraphics = null;
+                PDFJob job = new PDFJob(fileOutputStream);
+                pdfGraphics = job.getGraphics();
+                d.paintAll(pdfGraphics);
+                pdfGraphics.dispose();
+                job.end();
+                fileOutputStream.close();
+            } catch (IOException ee) {
+                JOptionPane.showMessageDialog(this, ee.getMessage());
+            }
+        }
     }
 
     /**
