@@ -2,6 +2,7 @@ package wprover;
 
 import maths.Param;
 
+import java.awt.geom.Ellipse2D;
 import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -237,7 +238,7 @@ public class CPoint extends CClass {
         setDrawSelect(g2);
         double x = getx();
         double y = gety();
-        g2.drawOval((int) Math.round(x - radius), (int) Math.round(y - radius), 2 * radius, 2 * radius);
+        g2.draw(new Ellipse2D.Double(x - radius, y - radius,2 * radius, 2 * radius));
     }
 
     /**
@@ -257,15 +258,15 @@ public class CPoint extends CClass {
 
         if (radius < 3) {
             setDraw(g2);
-            g2.fillOval((int) Math.round(x - radius), (int) Math.round(y - radius), 2 * radius, 2 * radius);
+            g2.fill(new Ellipse2D.Double(x - radius, y - radius,2 * radius, 2 * radius));
             return;
         }
         setDraw(g2);
         g2.setColor(new Color(0, 0, 0));
-        g2.fillOval((int) Math.round(x - radius), (int) Math.round(y - radius), 2 * radius, 2 * radius);
+        g2.fill(new Ellipse2D.Double(x - radius, y - radius,2 * radius, 2 * radius));
 
         setDraw(g2);
-        g2.fillOval((int) Math.round(x - radius + 1), (int) Math.round(y - radius + 1), 2 * radius - 2, 2 * radius - 2);
+        g2.fill(new Ellipse2D.Double(x - radius +1, y - radius+1,2 * radius-2, 2 * radius-2));
     }
 
     /**
