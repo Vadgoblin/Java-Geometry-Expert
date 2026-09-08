@@ -72,7 +72,7 @@ public class Circle extends CClass {
         y1 = o.y1.value;
         r = getRadius();
         if (r < CMisc.MAX_DRAW_LEN)
-            g2.drawOval((int) (x1 - r), (int) (y1 - r), 2 * (int) r, 2 * (int) r);
+            g2.drawOval((int)Math.round(x1 - r), (int) Math.round(y1 - r), (int)Math.round(2 *  r), (int)Math.round(2 *  r));
         else {
             if (points.size() < 2) return;
             CPoint p1, p2;
