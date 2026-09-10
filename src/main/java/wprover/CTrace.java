@@ -235,10 +235,9 @@ public class CTrace extends CClass {
     public void SavePS(FileOutputStream fp, int stype) throws IOException {
         if (!visible) return;
 
-         for (int i = 0; i < Num; i++) {
-                    if (dlns) {
-                if (oObj != null && oObj.get_type() == CClass.CIRCLE || i < Num -1)
-                {
+        for (int i = 0; i < Num; i++) {
+            if (dlns) {
+                if (oObj != null && oObj.get_type() == CClass.CIRCLE || i < Num - 1) {
 
                     int pos1x = PX[i];
                     int pos1y = PY[i];
@@ -246,10 +245,10 @@ public class CTrace extends CClass {
                     int pos2y = PY[(i + 1) % Num];
 
 
-                        String st1 = pos1x + " " + -pos1y + " moveto " + pos2x + " " + -pos2y + " lineto \n";
-                        fp.write(st1.getBytes());
-                        String st3 = "Color" + m_color + " stroke\n";
-                        fp.write(st3.getBytes());
+                    String st1 = pos1x + " " + -pos1y + " moveto " + pos2x + " " + -pos2y + " lineto \n";
+                    fp.write(st1.getBytes());
+                    String st3 = "Color" + m_color + " stroke\n";
+                    fp.write(st3.getBytes());
                 }
 
             }
