@@ -269,14 +269,7 @@ public class CTrace extends CClass {
             out.writeInt(PX[i]);
             out.writeInt(PY[i]);
         }
-
-//          private CPoint point, po;
-//    private CClass oObj;
-//
-//    private int Num = 16;
-//    private int[] PX, PY;
-//    private int Radius = 2;
-//    private boolean dlns;
+        
         int oid, mid;
         oid = mid = -1;
         if (po != null)
