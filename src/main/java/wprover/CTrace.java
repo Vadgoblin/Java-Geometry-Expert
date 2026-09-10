@@ -229,10 +229,10 @@ public class CTrace extends CClass {
      * Saves the trace to a PostScript file.
      *
      * @param fp the FileOutputStream to write to
-     * @param stype the stroke type
+     * @param sType the stroke type
      * @throws IOException if an I/O error occurs
      */
-    public void SavePS(FileOutputStream fp, int stype) throws IOException {
+    public void SavePS(FileOutputStream fp, int sType) throws IOException {
         if (!visible) return;
 
         for (int i = 0; i < Num; i++) {
