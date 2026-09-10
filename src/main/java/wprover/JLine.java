@@ -87,10 +87,10 @@ public class JLine {
     public void drawPt(Graphics2D g2) {
         for (int i = 0; i < vlist.size(); i++) {
             CPoint pt = (CPoint) vlist.get(i);
-            int x = (int) pt.getx();
-            int y = (int) pt.gety();
+            double x = pt.getx();
+            double y = pt.gety();
             int r = pt.getRadius();
-            g2.drawOval(x - r - 1, y - r - 1, 2 * r + 1, 2 * r + 1);
+            ShapeDrawer.drawEllipse(g2, x - r - 1, y - r - 1, 2 * r + 1, 2 * r + 1);
         }
     }
 
