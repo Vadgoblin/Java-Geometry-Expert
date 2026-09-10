@@ -11,6 +11,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.StyledDocument;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -186,7 +187,7 @@ public abstract class PanelAlgebraic extends JScrollPane implements Runnable, Ac
      */
     protected void addAlgebraicForm() {
         addString2s(getLanguage(1101, "The Algebraic Form:"));
-        Vector vp = dp.getPointList();
+        List<Object> vp = dp.getPointList();
         int n = vp.size();
         if (n == 0)
             return;

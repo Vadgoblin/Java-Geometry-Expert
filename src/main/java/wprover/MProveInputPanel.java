@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.border.LineBorder;
 import javax.swing.border.Border;
+import java.util.List;
 import java.util.Vector;
 import java.awt.*;
 import java.awt.event.*;
@@ -734,7 +735,7 @@ public class MProveInputPanel extends JToolBar implements ActionListener {
             box = new JComboBox(MDrObj.vlist);
             pane.add(box);
             box.addActionListener(this);
-            Vector v = dp.getPointList();
+            List<Object> v = dp.getPointList();
             pnum = v.size();
             this.add(Box.createHorizontalStrut(15));
             for (int i = 0; i < 5; i++) {
@@ -903,7 +904,7 @@ public class MProveInputPanel extends JToolBar implements ActionListener {
         }
 
         private void pointupdate() {
-            Vector v = dp.getPointList();
+            List<Object> v = dp.getPointList();
             for (int i = 0; i < vlist.size(); i++) {
                 JComboBox b = (JComboBox) vlist.get(i);
                 b.removeAllItems();

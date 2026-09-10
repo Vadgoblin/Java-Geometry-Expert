@@ -114,7 +114,7 @@ public class FactFinderDialog extends JBaseDialog implements ActionListener, Ite
      *
      * @param v the vector of points to set
      */
-    public void setPoints(Vector v) {
+    public void setPoints(List<Object> v) {
         b1.removeAllItems();
         b2.removeAllItems();
         b3.removeAllItems();

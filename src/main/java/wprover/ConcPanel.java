@@ -3,6 +3,7 @@ package wprover;
 import gprover.Cm;
 
 import javax.swing.*;
+import java.util.List;
 import java.util.Vector;
 import java.awt.*;
 import java.awt.event.*;
@@ -224,7 +225,7 @@ public class ConcPanel extends JPanel implements ActionListener, ItemListener {
      *
      * @param v the vector of points to set
      */
-    public void setPoints(Vector v) {
+    public void setPoints(List<Object> v) {
         for (int i = 0; i < vlist.size(); i++) {
             JComboBox b = (JComboBox) vlist.get(i);
             b.removeAllItems();

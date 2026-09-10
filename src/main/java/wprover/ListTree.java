@@ -5,6 +5,7 @@ import javax.swing.event.*;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.Vector;
 /**
  * ListTree provides a tabbed interface with two panels:
@@ -180,12 +181,12 @@ public class ListTree extends JTabbedPane
 
         DrawProcess dp = gxInstance.dp;
 
-        Vector v = dp.undolist;
+        List<Object> v = dp.undolist;
         undolist.addAll(v);
         for (int i = 0; i < undolist.size(); i++)
             model.addElement(undolist.get(i));
 
-        Vector vx = dp.getAllSolidObj();
+        List<Object> vx = dp.getAllSolidObj();
 
         for (Object o : vx) {
             if (o != null)

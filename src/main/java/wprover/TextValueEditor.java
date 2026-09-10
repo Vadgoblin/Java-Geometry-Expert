@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -150,7 +151,7 @@ public class TextValueEditor extends JBaseDialog implements ActionListener, KeyL
         mdata = new JPopupMenu();
         JMenu m = new JMenu(GExpert.getLanguage("Coordinates"));
         mdata.add(m);
-        Vector v = gxInstance.dp.getPointList();
+        List<Object> v = gxInstance.dp.getPointList();
         for (int i = 0; i < v.size(); i++) {
             CPoint p = (CPoint) v.get(i);
             String s = p.getname();

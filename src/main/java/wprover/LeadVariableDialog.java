@@ -8,6 +8,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.table.TableColumn;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
@@ -116,7 +118,7 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
      * @param s the vector containing the variables to load
      * @param r a boolean indicating whether to reduce the variables
      */
-    public void loadVariable(Vector s, boolean r) {
+    public void loadVariable(List<Object> s, boolean r) {
         try {
             loadAllPoints(s, r);
         } catch (OutOfMemoryError ee) {
@@ -131,16 +133,16 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
      * @param v the vector containing the points to load
      * @param r a boolean indicating whether to reduce the points
      */
-    public void loadAllPoints(Vector v, boolean r) {
-        Vector vdata = new Vector();
+    public void loadAllPoints(List<Object> v, boolean r) {
+        List<Object> vdata = new ArrayList<>();
 
         for (int i = 0; i < v.size(); i++) {
             CPoint p = (CPoint) v.get(i);
             Param p1 = p.x1;
             Param p2 = p.y1;
             if (p1 != null || p2 != null) {
-                Vector o1 = new Vector();
-                Vector o2 = new Vector();
+                List<Object> o1 = new ArrayList<>();
+                List<Object> o2 = new ArrayList<>();
                 o1.add(p);
                 o2.add("");
 
@@ -263,8 +265,8 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
      * It extends DefaultTableModel and provides methods to manage the data displayed in the table.
      */
     class LVTableModel extends DefaultTableModel {
-        Vector vlist = new Vector();
-        Vector vdlist = new Vector();
+        List<Object> vlist = new ArrayList<>();
+        List<Object> vdlist = new ArrayList<>();
 
         public LVTableModel() {
             vlist.add(getLanguage("Name"));
@@ -273,7 +275,7 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
             vlist.add(getLanguage("Polynomial"));
         }
 
-        public void setDataList(Vector v) {
+        public void setDataList(List<Object> v) {
             vdlist.clear();
             vdlist.addAll(v);
             this.fireTableDataChanged();

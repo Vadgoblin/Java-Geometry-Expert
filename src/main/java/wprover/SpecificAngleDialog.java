@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.ItemEvent;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -28,7 +29,7 @@ public class SpecificAngleDialog extends JBaseDialog implements ActionListener, 
      * @param type  the type of the dialog (0: define, 1: already defined, 2: set angle)
      * @param v     the vector of angles to be used in the dialog
      */
-    public SpecificAngleDialog(GExpert owner, int type, Vector v) {
+    public SpecificAngleDialog(GExpert owner, int type, List<Object> v) {
         super(owner.getFrame(), true);
         gxInstance = owner;
 

@@ -5,6 +5,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -35,7 +36,7 @@ public class SelectDialog extends JBaseDialog implements
      * @param owner the GExpert instance to associate with this dialog
      * @param vlist the list of items to display in the dialog
      */
-    public SelectDialog(GExpert owner, Vector vlist) {
+    public SelectDialog(GExpert owner, List<Object> vlist) {
         super(owner.getFrame(), "Select");
         gxInstance = owner;
 
@@ -100,7 +101,7 @@ public class SelectDialog extends JBaseDialog implements
      *
      * @param v the vector of items to add
      */
-    public void addItem(Vector v) {
+    public void addItem(List<Object> v) {
         listModel.clear();
         selectedlist.clear();
 

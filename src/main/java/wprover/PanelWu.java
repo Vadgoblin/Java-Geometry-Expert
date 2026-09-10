@@ -3,6 +3,7 @@ package wprover;
 import gprover.*;
 
 import javax.swing.*;
+import java.util.List;
 import java.util.Vector;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
@@ -168,7 +169,7 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
         addString2(GExpert.getLanguage("The equational hypotheses:"));
 
         TPoly pp = null;
-        Vector vc = dp.getAllConstraint();
+        List<Object> vc = dp.getAllConstraint();
         int n = 1;
         for (int i = 0; i < vc.size(); i++) {
             Constraint c = (Constraint) vc.get(i);
