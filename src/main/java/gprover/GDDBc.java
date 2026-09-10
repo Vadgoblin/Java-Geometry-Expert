@@ -9,6 +9,7 @@ package gprover;
 
 import wprover.GExpert;
 
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -1426,7 +1427,7 @@ public class GDDBc extends GDDAux {
         Cond pr1;
         while (co != null) {
             show_pred(co);
-            Vector v = co.vlist;
+            List<Object> v = co.vlist;
             if (v != null)
                 for (int i = 0; i < v.size(); i++) {
                     pr1 = (Cond) v.get(i);
