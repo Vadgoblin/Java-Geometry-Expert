@@ -63,8 +63,7 @@ public class TextFrame extends JBaseDialog implements ItemListener,
         Font cfont = new Font("Dialog", Font.PLAIN, 16);
 
         fontfamily = new ArrayList<>();
-        for (int i = 1; i < envfonts.length; i++)
-            fontfamily.add(envfonts[i]);
+        fontfamily.addAll(Arrays.asList(envfonts).subList(1, envfonts.length)); // wonder why skip first font
         fonts = new JComboBox(fontfamily.toArray());
         fonts.setFont(tf);
 
@@ -154,7 +153,7 @@ public class TextFrame extends JBaseDialog implements ItemListener,
         styles.setSelectedIndex(type);
 
         for (int i = 0; i < sizes.getItemCount(); i++) {
-            int s = ((Integer) sizes.getItemAt(i)).intValue();
+            int s = ((Integer) sizes.getItemAt(i));
             if (s == size) {
                 sizes.setSelectedIndex(i);
                 break;
@@ -239,7 +238,7 @@ public class TextFrame extends JBaseDialog implements ItemListener,
 
             CText ct = text;
             if (ct == null) {
-                if (str == null || str.length() == 0) {
+                if (str == null || str.isEmpty()) {
                     this.setVisible(false);
                     return;
                 }

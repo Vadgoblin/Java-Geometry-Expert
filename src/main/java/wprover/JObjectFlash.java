@@ -4,16 +4,14 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.ArrayList;
 
 /**
  * A class that represents a flashing effect for graphical objects.
  */
 public class JObjectFlash extends JFlash implements ActionListener {
-    private static int TIMERS = 130;
-    private static int MAXFLASHTIMES = 12;
-    private java.util.List<Object> vlist;
+    private static final int MAXFLASHTIMES = 12;
+    private final java.util.List<Object> vlist;
     private int count = 0;
 
     /**
@@ -45,10 +43,7 @@ public class JObjectFlash extends JFlash implements ActionListener {
      * @param e the action event
      */
     public void actionPerformed(ActionEvent e) {
-        if (count % 2 == 0)
-            setListInFlashing(vlist, false);
-        else
-            setListInFlashing(vlist, true);
+        setListInFlashing(vlist, count % 2 != 0);
         if (panel != null)
             panel.repaint();
         count++;
@@ -60,12 +55,12 @@ public class JObjectFlash extends JFlash implements ActionListener {
      * Sets the flashing mode for all objects in the list.
      *
      * @param v       the list of objects
-     * @param inflash true to enable flashing mode, false to disable
+     * @param inFlash true to enable flashing mode, false to disable
      */
-    private void setListInFlashing(java.util.List<Object> v, boolean inflash) {
-        for (int i = 0; i < v.size(); i++) {
-            CClass cc = (CClass) v.get(i);
-            cc.setInFlashing(inflash);
+    private void setListInFlashing(java.util.List<Object> v, boolean inFlash) {
+        for (Object o : v) {
+            CClass cc = (CClass) o;
+            cc.setInFlashing(inFlash);
         }
     }
 
@@ -75,8 +70,8 @@ public class JObjectFlash extends JFlash implements ActionListener {
      * @param v the list of objects
      */
     private void stopListFlash(java.util.List<Object> v) {
-        for (int i = 0; i < v.size(); i++) {
-            CClass cc = (CClass) v.get(i);
+        for (Object o : v) {
+            CClass cc = (CClass) o;
             cc.stopFlash();
         }
     }
@@ -91,8 +86,8 @@ public class JObjectFlash extends JFlash implements ActionListener {
         panel = p;
         stopListFlash(vlist);
         vlist.clear();
-        for (int i = 0; i < list.size(); i++) {
-            CClass c = (CClass) list.get(i);
+        for (Object o : list) {
+            CClass c = (CClass) o;
             if (c != null && c.visible())
                 vlist.add(c);
         }
@@ -112,7 +107,7 @@ public class JObjectFlash extends JFlash implements ActionListener {
      * Starts the flashing effect.
      */
     public void start() {
-        if (vlist.size() == 0) {
+        if (vlist.isEmpty()) {
             stop();
             return;
         }
