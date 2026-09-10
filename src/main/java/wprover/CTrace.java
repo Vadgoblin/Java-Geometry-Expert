@@ -17,7 +17,8 @@ public class CTrace extends CClass {
     private CClass oObj;
 
     private int Num = 40;
-    private int[] PX, PY;
+    private final int[] PX;
+    private final int[] PY;
     private int Radius = 2;
     private boolean dlns;
     private final static int MAXLEN = 300;
