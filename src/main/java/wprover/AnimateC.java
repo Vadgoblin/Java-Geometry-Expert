@@ -11,8 +11,8 @@ public class AnimateC {
 
     double bx, by;
 
-    double minwd = 0;
-    double minht = 0;
+    double minWd = 0;
+    double minHt = 0;
     double width = 0;
     double height = 0;
 
@@ -29,7 +29,7 @@ public class AnimateC {
 
     double gap = CMisc.ANIMATE_GAP;
 
-    int pindex = 0;
+    int pIndex = 0;
     int step_time = 0; // for trace;
 
     double delta = 0.05;
@@ -54,7 +54,7 @@ public class AnimateC {
         csa = n.csa;
         sia = n.sia;
         gap = n.gap;
-        pindex = n.pindex;
+        pIndex = n.pIndex;
         step_time = n.step_time;
         delta = n.delta;
     }
@@ -203,7 +203,7 @@ public class AnimateC {
      *
      * @param step The step value to set.
      */
-    void Setstep(double step) {
+    void setStep(double step) {
         gap = step + delta;
 
         if (onType == 3) {
@@ -360,8 +360,8 @@ public class AnimateC {
                     Math.pow(pt.gety() - ry, 2));
             return (int) Math.abs(Math.PI * r * 2 / gap);
         } else if (onType == 1) {
-            int n1 = (int) Math.abs((width - minwd) / (gap * dx));
-            int n2 = (int) Math.abs((height - minht) / (gap * dy));
+            int n1 = (int) Math.abs((width - minWd) / (gap * dx));
+            int n2 = (int) Math.abs((height - minHt) / (gap * dy));
             return Math.min(n1, n2) * 2;
         }
         return 0;
@@ -391,7 +391,7 @@ public class AnimateC {
         } else if (onType == 1) {
             double x = pA.getx() + gap * dx;
             double y = pA.gety() + gap * dy;
-            if (x < minwd || x > width || y < minht || y > height) {
+            if (x < minWd || x > width || y < minHt || y > height) {
                 dx = -dx;
                 dy = -dy;
                 r = false;
@@ -404,11 +404,11 @@ public class AnimateC {
             if (len == 0) {
                 return r;
             }
-            if (pindex >= len) {
-                pindex = 0;
+            if (pIndex >= len) {
+                pIndex = 0;
             }
-            pA.setXY(ct.getPtXi(pindex), ct.getPtYi(pindex));
-            pindex++;
+            pA.setXY(ct.getPtXi(pIndex), ct.getPtYi(pIndex));
+            pIndex++;
         }
 
         x = pA.getx();
@@ -449,7 +449,7 @@ public class AnimateC {
         out.writeDouble(csa);
         out.writeDouble(sia);
         out.writeDouble(gap);
-        out.writeInt(pindex);
+        out.writeInt(pIndex);
         out.writeInt(step_time);
 
     }
@@ -485,7 +485,7 @@ public class AnimateC {
         csa = in.readDouble();
         sia = in.readDouble();
         gap = in.readDouble();
-        pindex = in.readInt();
+        pIndex = in.readInt();
         step_time = in.readInt();
 
     }
