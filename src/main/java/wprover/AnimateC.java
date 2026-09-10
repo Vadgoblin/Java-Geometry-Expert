@@ -72,11 +72,11 @@ public class AnimateC {
             return null;
         }
 
-        String son = "\nANI " + pA.toString();
+        String son = "\nANI " + pA;
 
         if (onType == 1) {
             CLine ln = (CLine) onObj;
-            CPoint pl[] = ln.getTowSideOfLine();
+            CPoint[] pl = ln.getTowSideOfLine();
             if (pl == null) {
                 return null;
             }
@@ -106,9 +106,6 @@ public class AnimateC {
             return false;
         }
         s = s.substring(4);
-        if (s == null) {
-            return false;
-        }
         s = s.trim();
         int index = 0;
         int len = s.length();
