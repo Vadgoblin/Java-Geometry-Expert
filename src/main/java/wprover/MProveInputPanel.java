@@ -597,7 +597,7 @@ public class MProveInputPanel extends JToolBar implements ActionListener {
         public symbolPanel() {
             this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
             MSymbol.createAllIcons();
-            box = new JComboBox(MSymbol.vlist);
+            box = new JComboBox(MSymbol.vlist.toArray());
             box.setAlignmentX(Component.LEFT_ALIGNMENT);
             this.add(box);
             box.addItemListener(this);
@@ -732,7 +732,7 @@ public class MProveInputPanel extends JToolBar implements ActionListener {
             JPanel pane = new JPanel();
             pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
 
-            box = new JComboBox(MDrObj.vlist);
+            box = new JComboBox(MDrObj.vlist.toArray());
             pane.add(box);
             box.addActionListener(this);
             List<Object> v = dp.getPointList();
