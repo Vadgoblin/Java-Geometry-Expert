@@ -225,7 +225,7 @@ public class AnimateC {
         }
 
         CTrace ct = (CTrace) onObj;
-        double len = ct.Roud_length();
+        double len = ct.roudLength();
         int n = ct.getPointSize();
         if (n == 0) {
             return 0;
@@ -407,7 +407,7 @@ public class AnimateC {
             if (pindex >= len) {
                 pindex = 0;
             }
-            pA.setXY(ct.getPtxi(pindex), ct.getPtyi(pindex));
+            pA.setXY(ct.getPtXi(pindex), ct.getPtYi(pindex));
             pindex++;
         }
 

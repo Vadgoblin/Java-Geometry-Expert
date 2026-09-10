@@ -952,7 +952,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
         for (int i = 0; i < nt; i++) {
             CTrace t = (CTrace) tracelist.get(i);
             CPoint p = t.getPoint();
-            CPoint po = t.getonPoint();
+            CPoint po = t.getOnPoint();
             if (p == null || po == null)
                 continue;
 

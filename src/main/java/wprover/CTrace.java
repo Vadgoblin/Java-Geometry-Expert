@@ -269,7 +269,7 @@ public class CTrace extends CClass {
             out.writeInt(PX[i]);
             out.writeInt(PY[i]);
         }
-        
+
         int oid, mid;
         oid = mid = -1;
         if (po != null)
@@ -392,7 +392,7 @@ public class CTrace extends CClass {
      *
      * @return the round length of the trace
      */
-    public double Roud_length() {
+    public double roudLength() {
         if (Num == 0) return 0.0;
 
         double len = 0;
@@ -415,7 +415,7 @@ public class CTrace extends CClass {
      * @param i the index of the trace point
      * @return the x coordinate of the trace point
      */
-    int getPtxi(int i) {
+    int getPtXi(int i) {
         return PX[i];
     }
 
@@ -425,7 +425,7 @@ public class CTrace extends CClass {
      * @param i the index of the trace point
      * @return the y coordinate of the trace point
      */
-    int getPtyi(int i) {
+    int getPtYi(int i) {
         return PY[i];
     }
 
@@ -443,7 +443,7 @@ public class CTrace extends CClass {
      *
      * @return the point on the trace
      */
-    public CPoint getonPoint() {
+    public CPoint getOnPoint() {
         return po;
     }
 
