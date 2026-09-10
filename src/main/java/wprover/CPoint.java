@@ -3,6 +3,7 @@ package wprover;
 import maths.Param;
 
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -312,12 +313,12 @@ public class CPoint extends CClass {
         int radius = CMisc.getPointRadius() + 2;
 
         g2.setColor(Color.white);
-        g2.fill(new Ellipse2D.Double(x - radius + 1, y - radius + 1, 2 * radius - 2, 2 * radius - 2));
+        fillEllipse(g2, x - radius + 1, y - radius + 1, 2 * radius - 2, 2 * radius - 2);
 
         g2.setColor(Color.black);
-        g2.draw(new Ellipse2D.Double(x - radius , y - radius , 2 * radius , 2 * radius ));
+        drawEllipse(g2, x - radius , y - radius , 2 * radius , 2 * radius );
         radius -= 3;
-        g2.draw(new Ellipse2D.Double(x - radius , y - radius , 2 * radius , 2 * radius ));
+        drawEllipse(g2,x - radius , y - radius , 2 * radius , 2 * radius );
     }
 
     /**
@@ -704,6 +705,22 @@ public class CPoint extends CClass {
         }
     }
 
+    private static final Ellipse2D.Double REUSABLE_ELLIPSE = new Ellipse2D.Double();
 
+    /**
+     * Draws an ellipse to the argument graphics object
+     */
+    private static void drawEllipse(Graphics2D g2, double x, double y, double w, double h) {
+        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
+        g2.draw(REUSABLE_ELLIPSE);
+    }
+
+    /**
+     * Fills an ellipse to the argument graphics object
+     */
+    private static void fillEllipse(Graphics2D g2, double x, double y, double w, double h) {
+        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
+        g2.fill(REUSABLE_ELLIPSE);
+    }
 }
 
