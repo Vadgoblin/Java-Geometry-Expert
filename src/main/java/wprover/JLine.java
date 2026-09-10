@@ -77,7 +77,6 @@ public class JLine {
                 }
             }
         }
-        // drawPt(g2);
     }
 
     /**
