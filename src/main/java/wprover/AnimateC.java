@@ -57,6 +57,8 @@ public class AnimateC {
         pIndex = n.pIndex;
         step_time = n.step_time;
         delta = n.delta;
+        minHt = n.minHt;
+        minWd = n.minWd;
     }
 
 
