@@ -271,7 +271,7 @@ public class CLine extends CClass {
             yb = (a - 2 * xb * (x1 - x2)) / (2 * (y1 - y2));
         }
 
-        g2.drawLine((int) xa, (int) ya, (int) xb, (int) yb);
+        drawLine(g2, xa, ya, xb, yb);
     }
 
     /**
@@ -292,8 +292,6 @@ public class CLine extends CClass {
 
         double k = line.getK();
         drawXLine(p.getx(), p.gety(), k, g2);
-
-
     }
 
     /**
@@ -309,15 +307,15 @@ public class CLine extends CClass {
             double x = x0;
             double y1 = 0;
             double y2 = Height;
-            g2.drawLine((int) x, (int) y1, (int) x, (int) y2);
+            drawLine(g2, x, y1, x, y2);
         } else if (Math.abs(k) < CMisc.ZERO) {
-            g2.drawLine(0, (int) y0, (int) Width, (int) y0);
+            drawLine(g2, 0, y0, Width, y0);
         } else {
             double y1 = 0;
             double y2 = Height;
             double x1 = (y1 - y0 + k * x0) / k;
             double x2 = (y2 - y0 + k * x0) / k;
-            g2.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+            drawLine(g2, x1, y1, x2, y2);
         }
     }
 
@@ -373,7 +371,7 @@ public class CLine extends CClass {
         if (pl == null) return;
 
         if (line.ext_type == 0)
-            g2.draw(new Line2D.Double(pl[0].getx(), pl[0].gety(), pl[1].getx(), pl[1].gety()));
+            drawLine(g2, pl[0].getx(), pl[0].gety(), pl[1].getx(), pl[1].gety());
 
 
         double dx = pl[1].getx() - pl[0].getx();
@@ -384,13 +382,13 @@ public class CLine extends CClass {
             dx = dx * line.getExtent() / dlt;
             dy = dy * line.getExtent() / dlt;
 
-            g2.draw(new Line2D.Double(pl[0].getx() - dx, pl[0].gety() - dy, pl[1].getx() + dx, pl[1].gety() + dy));
+            drawLine(g2, pl[0].getx() - dx, pl[0].gety() - dy, pl[1].getx() + dx, pl[1].gety() + dy);
         } else if (line.ext_type == 2) {
             int len = Width > Height ? Width : Height;
             dx = len * dx / dlt;
             dy = len * dy / dlt;
 
-            g2.draw(new Line2D.Double(pl[0].getx() - dx, pl[0].gety() - dy, pl[1].getx() + dx, pl[1].gety() + dy));
+            drawLine(g2, pl[0].getx() - dx, pl[0].gety() - dy, pl[1].getx() + dx, pl[1].gety() + dy);
         }
     }
 
@@ -406,7 +404,7 @@ public class CLine extends CClass {
             double x = pt.getx();
             double y1 = 0;
             double y2 = Height;
-            g2.drawLine((int) x, (int) y1, (int) x, (int) y2);
+            drawLine(g2, x, y1, x, y2);
 
         } else {
             double k = line.getK();
@@ -414,7 +412,7 @@ public class CLine extends CClass {
             double x2 = Width;
             double y1 = k * (0 - pt.getx()) + pt.gety();
             double y2 = k * (x2 - pt.getx()) + pt.gety();
-            g2.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+            drawLine(g2, x1, y1, x2, y2);
         }
     }
 
@@ -430,9 +428,9 @@ public class CLine extends CClass {
             double x = pt.getx();
             double y1 = 0;
             double y2 = Height;
-            g2.drawLine((int) x, (int) y1, (int) x, (int) y2);
+            drawLine(g2, x, y1, x, y2);
         } else if (line.isVertical()) {
-            g2.drawLine(0, (int) pt.gety(), (int) Width, (int) pt.gety());
+            drawLine(g2,0, pt.gety(), Width, pt.gety());
         } else {
             double k = line.getK();
             k = -1.0 / k;
@@ -440,7 +438,7 @@ public class CLine extends CClass {
             double y2 = Height;
             double x1 = (y1 - pt.gety() + k * pt.getx()) / k;
             double x2 = (y2 - pt.gety() + k * pt.getx()) / k;
-            g2.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+            drawLine(g2,x1, y1, x2, y2);
         }
     }
     /////////////////////////////////////////////
@@ -1803,5 +1801,21 @@ public class CLine extends CClass {
             extent = in.readInt();
     }
 
+
+    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
+
+    /**
+     * Draws a line to the argument graphics object
+     *
+     * @param g2 the Graphics2D instance to draw to
+     * @param x1 the x coorditante of the start point
+     * @param y1 the y coorditante of the start point
+     * @param x2 the x coorditante of the end point
+     * @param y2 the y coorditante of the end point
+     */
+    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
+        REUSABLE_LINE.setLine(x1, y1, x2, y2);
+        g2.draw(REUSABLE_LINE);
+    }
 }
 
