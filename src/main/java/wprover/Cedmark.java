@@ -1,7 +1,6 @@
 package wprover;
 
 import java.awt.*;
-import java.awt.geom.Line2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -147,7 +146,7 @@ public class Cedmark extends CClass {
 
         double xx2 = x + dy * length;
         double yy2 = y - dx * length;
-        drawLine(g2, xx1, yy1, xx2, yy2);
+        ShapeDrawer.drawLine(g2, xx1, yy1, xx2, yy2);
     }
 
     /**
@@ -210,7 +209,7 @@ public class Cedmark extends CClass {
 
         if (!this.isdraw()) {
             g2.setColor(Color.white);
-            drawLine(g2, x1, y1, x2 ,y2);
+            ShapeDrawer.drawLine(g2, x1, y1, x2 ,y2);
         }
     }
 
@@ -358,22 +357,5 @@ public class Cedmark extends CClass {
         p2 = dp.getPointById(id);
         length = in.readInt();
         dnum = in.readInt();
-    }
-
-
-    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
-
-    /**
-     * Draws a line to the argument graphics object
-     *
-     * @param g2 the Graphics2D instance to draw to
-     * @param x1 the x coorditante of the start point
-     * @param y1 the y coorditante of the start point
-     * @param x2 the x coorditante of the end point
-     * @param y2 the y coorditante of the end point
-     */
-    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
-        REUSABLE_LINE.setLine(x1, y1, x2, y2);
-        g2.draw(REUSABLE_LINE);
     }
 }

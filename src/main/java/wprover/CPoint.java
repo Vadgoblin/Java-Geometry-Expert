@@ -2,8 +2,6 @@ package wprover;
 
 import maths.Param;
 
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -239,7 +237,7 @@ public class CPoint extends CClass {
         setDrawSelect(g2);
         double x = getx();
         double y = gety();
-        g2.draw(new Ellipse2D.Double(x - radius, y - radius,2 * radius, 2 * radius));
+        ShapeDrawer.drawEllipse(g2, x - radius, y - radius,2 * radius, 2 * radius);
     }
 
     /**
@@ -259,15 +257,15 @@ public class CPoint extends CClass {
 
         if (radius < 3) {
             setDraw(g2);
-            g2.fill(new Ellipse2D.Double(x - radius, y - radius,2 * radius, 2 * radius));
+            ShapeDrawer.fillEllipse(g2, x - radius, y - radius,2 * radius, 2 * radius);
             return;
         }
         setDraw(g2);
         g2.setColor(new Color(0, 0, 0));
-        g2.fill(new Ellipse2D.Double(x - radius, y - radius,2 * radius, 2 * radius));
+        ShapeDrawer.fillEllipse(g2, x - radius, y - radius,2 * radius, 2 * radius);
 
         setDraw(g2);
-        g2.fill(new Ellipse2D.Double(x - radius +1, y - radius+1,2 * radius-2, 2 * radius-2));
+        ShapeDrawer.fillEllipse(g2, x - radius +1, y - radius+1,2 * radius-2, 2 * radius-2);
     }
 
     /**
@@ -284,9 +282,9 @@ public class CPoint extends CClass {
         double y = gety();
         setDraw(g2);
         g2.setColor(Color.black);
-        g2.fill(new Ellipse2D.Double(x - radius, y - radius, 2 * radius, 2 * radius));
+        ShapeDrawer.fillEllipse(g2, x - radius, y - radius, 2 * radius, 2 * radius);
         g2.setColor(super.getColor());
-        g2.fill(new Ellipse2D.Double(x - radius + 1, y - radius + 1, 2 * radius - 2, 2 * radius - 2));
+        ShapeDrawer.fillEllipse(g2,x - radius + 1, y - radius + 1, 2 * radius - 2, 2 * radius - 2);
     }
 
 /**
@@ -313,12 +311,12 @@ public class CPoint extends CClass {
         int radius = CMisc.getPointRadius() + 2;
 
         g2.setColor(Color.white);
-        fillEllipse(g2, x - radius + 1, y - radius + 1, 2 * radius - 2, 2 * radius - 2);
+        ShapeDrawer.fillEllipse(g2, x - radius + 1, y - radius + 1, 2 * radius - 2, 2 * radius - 2);
 
         g2.setColor(Color.black);
-        drawEllipse(g2, x - radius , y - radius , 2 * radius , 2 * radius );
+        ShapeDrawer.drawEllipse(g2, x - radius , y - radius , 2 * radius , 2 * radius );
         radius -= 3;
-        drawEllipse(g2,x - radius , y - radius , 2 * radius , 2 * radius );
+        ShapeDrawer.drawEllipse(g2,x - radius , y - radius , 2 * radius , 2 * radius );
     }
 
     /**
@@ -703,24 +701,6 @@ public class CPoint extends CClass {
             if (CMisc.version_load_now >= 0.050)
                 freezed = in.readBoolean();
         }
-    }
-
-    private static final Ellipse2D.Double REUSABLE_ELLIPSE = new Ellipse2D.Double();
-
-    /**
-     * Draws an ellipse to the argument graphics object
-     */
-    private static void drawEllipse(Graphics2D g2, double x, double y, double w, double h) {
-        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
-        g2.draw(REUSABLE_ELLIPSE);
-    }
-
-    /**
-     * Fills an ellipse to the argument graphics object
-     */
-    private static void fillEllipse(Graphics2D g2, double x, double y, double w, double h) {
-        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
-        g2.fill(REUSABLE_ELLIPSE);
     }
 }
 

@@ -1,15 +1,12 @@
 package wprover;
 
 import java.awt.*;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Line2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
 
 import gprover.Cm;
-import org.apache.batik.ext.awt.geom.Polygon2D;
 
 /**
  * Class representing an angle in a geometric construction.
@@ -520,7 +517,7 @@ public class CAngle extends CClass {
         }
         g2.setColor(Color.red);
         g2.setStroke(CMisc.DashedStroke);
-        drawLine(g2, dx1, dy1,xf, yf);
+        ShapeDrawer.drawLine(g2, dx1, dy1,xf, yf);
     }
 
     /**
@@ -552,9 +549,9 @@ public class CAngle extends CClass {
             g2.setColor(Color.red);
             g2.setStroke(CMisc.DashedStroke);
             if (!lstart.inside(x, y))
-                drawLine(g2, x, y, p1.getx(), p1.gety());
+                ShapeDrawer.drawLine(g2, x, y, p1.getx(), p1.gety());
             if (!lend.inside(x, y))
-                drawLine(g2, x, y, p2.getx(), p2.gety());
+                ShapeDrawer.drawLine(g2, x, y, p2.getx(), p2.gety());
         }
         drawauxLine1(x, y, pstart, pl1[0], pl1[1], g2);
         drawauxLine1(x, y, pend, pl2[0], pl2[1], g2);
@@ -633,7 +630,7 @@ public class CAngle extends CClass {
 
         if (isSelected) {
             setDrawSelect(g2);
-            drawArc(g2,r[0] - radius, r[1] - radius, radius * 2, radius * 2, ri1, dr);
+            ShapeDrawer.drawArc(g2,r[0] - radius, r[1] - radius, radius * 2, radius * 2, ri1, dr);
             return;
         } else
             super.setDraw(g2);
@@ -685,18 +682,18 @@ public class CAngle extends CClass {
 
         if (ftype == 2) {
             for (int i = 1; i < value1; i++) {
-                drawArc(g2, x + i * 4, y + i * 4, w - i * 8, w - i * 8, ri1,dr);
+                ShapeDrawer.drawArc(g2, x + i * 4, y + i * 4, w - i * 8, w - i * 8, ri1,dr);
             }
         } else if (ftype == 3) {
             Composite ac = g2.getComposite();
             g2.setComposite(CMisc.getFillComposite());
 
             g2.setColor(DrawData.getColor(value1));
-            fillArc(g2, x, y, w, w, ri1, dr);
+            ShapeDrawer.fillArc(g2, x, y, w, w, ri1, dr);
             g2.setComposite(ac);
             g2.setColor(super.getColor());
         }
-        drawArc(g2, x, y, w, w, (int) ri1, (int) dr);
+        ShapeDrawer.drawArc(g2, x, y, w, w, (int) ri1, (int) dr);
 
 
         if (CMisc.show_angle_text) {
@@ -1045,44 +1042,6 @@ public class CAngle extends CClass {
                 value1 = in.readInt();
             }
         }
-    }
-
-     //
-     // Graphics helpers todo: move to dedicated class?
-     //
-
-    private static final Arc2D.Double REUSABLE_ARC = new Arc2D.Double();
-
-    /**
-     * Draws an arch to the argument graphics object
-     */
-    private static void drawArc(Graphics2D g2, double x, double y, double w, double h, double sa, double aa) {
-        REUSABLE_ARC.setArc(x, y, w, h, sa, aa, Arc2D.OPEN);
-        g2.draw(REUSABLE_ARC);
-    }
-
-    /**
-     * Fills an arch to the argument graphics object
-     */
-    private static void fillArc(Graphics2D g2, double x, double y, double w, double h, double sa, double aa) {
-        REUSABLE_ARC.setArc(x, y, w, h, sa, aa, Arc2D.OPEN);
-        g2.fill(REUSABLE_ARC);
-    }
-
-    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
-
-    /**
-     * Draws a line to the argument graphics object
-     *
-     * @param g2 the Graphics2D instance to draw to
-     * @param x1 the x coorditante of the start point
-     * @param y1 the y coorditante of the start point
-     * @param x2 the x coorditante of the end point
-     * @param y2 the y coorditante of the end point
-     */
-    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
-        REUSABLE_LINE.setLine(x1, y1, x2, y2);
-        g2.draw(REUSABLE_LINE);
     }
 }
 

@@ -1,7 +1,5 @@
 package wprover;
 
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -74,7 +72,7 @@ public class Circle extends CClass {
         y1 = o.y1.value;
         r = getRadius();
         if (r < CMisc.MAX_DRAW_LEN)
-            drawEllipse(g2, x1 - r, y1 - r,2 *  r, 2 *  r);
+            ShapeDrawer.drawEllipse(g2, x1 - r, y1 - r,2 *  r, 2 *  r);
         else {
             if (points.size() < 2) return;
             CPoint p1, p2;
@@ -102,7 +100,7 @@ public class Circle extends CClass {
             y1 = p1.gety() - dy * 2000 / sl;
             double x2 = p1.getx() + dx * 2000 / sl;
             double y2 = p1.gety() + dy * 2000 / sl;
-            drawLine(g2, x1, y1, x2, y2);
+            ShapeDrawer.drawLine(g2, x1, y1, x2, y2);
         }
     }
 
@@ -591,37 +589,5 @@ public class Circle extends CClass {
                 cons.add(dp.getConstraintByid(dx));
             }
         }
-    }
-    private static final Ellipse2D.Double REUSABLE_ELLIPSE = new Ellipse2D.Double();
-
-    /**
-     * Draws an ellipse to the argument graphics object
-     */
-    private static void drawEllipse(Graphics2D g2, double x, double y, double w, double h) {
-        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
-        g2.draw(REUSABLE_ELLIPSE);
-    }
-
-    /**
-     * Fills an ellipse to the argument graphics object
-     */
-    private static void fillEllipse(Graphics2D g2, double x, double y, double w, double h) {
-        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
-        g2.fill(REUSABLE_ELLIPSE);
-    }
-    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
-
-    /**
-     * Draws a line to the argument graphics object
-     *
-     * @param g2 the Graphics2D instance to draw to
-     * @param x1 the x coorditante of the start point
-     * @param y1 the y coorditante of the start point
-     * @param x2 the x coorditante of the end point
-     * @param y2 the y coorditante of the end point
-     */
-    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
-        REUSABLE_LINE.setLine(x1, y1, x2, y2);
-        g2.draw(REUSABLE_LINE);
     }
 }

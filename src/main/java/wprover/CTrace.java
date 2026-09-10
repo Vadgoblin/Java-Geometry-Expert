@@ -1,8 +1,6 @@
 package wprover;
 
 import java.awt.*;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
@@ -133,7 +131,7 @@ public class CTrace extends CClass {
 
         for (int i = 0; i < Num; i++) {
             if (!dlns)
-                fillEllipse(g2, PX[i] - radius / 2.0, PY[i] - radius / 2.0, radius, radius);
+                ShapeDrawer.fillEllipse(g2, PX[i] - radius / 2.0, PY[i] - radius / 2.0, radius, radius);
             if (dlns) {
                 if (oObj != null && oObj.get_type() == CClass.CIRCLE)
                     drawALN(PX[i], PY[i], PX[(i + 1) % Num], PY[(i + 1) % Num], g2);
@@ -165,7 +163,7 @@ public class CTrace extends CClass {
         if(dx > MAXLEN || dx < - MAXLEN || dy > MAXLEN || dy < -MAXLEN)
             return;
 
-        drawLine(g2, x, y, x1, y1);
+        ShapeDrawer.drawLine(g2, x, y, x1, y1);
     }
 
     /**
@@ -472,40 +470,5 @@ public class CTrace extends CClass {
      */
     public int getPointSize() {
         return Num;
-    }
-
-
-    private static final Ellipse2D.Double REUSABLE_ELLIPSE = new Ellipse2D.Double();
-
-    /**
-     * Draws an ellipse to the argument graphics object
-     */
-    private static void drawEllipse(Graphics2D g2, double x, double y, double w, double h) {
-        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
-        g2.draw(REUSABLE_ELLIPSE);
-    }
-
-    /**
-     * Fills an ellipse to the argument graphics object
-     */
-    private static void fillEllipse(Graphics2D g2, double x, double y, double w, double h) {
-        REUSABLE_ELLIPSE.setFrame(x, y, w, h);
-        g2.fill(REUSABLE_ELLIPSE);
-    }
-
-    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
-
-    /**
-     * Draws a line to the argument graphics object
-     *
-     * @param g2 the Graphics2D instance to draw to
-     * @param x1 the x coorditante of the start point
-     * @param y1 the y coorditante of the start point
-     * @param x2 the x coorditante of the end point
-     * @param y2 the y coorditante of the end point
-     */
-    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
-        REUSABLE_LINE.setLine(x1, y1, x2, y2);
-        g2.draw(REUSABLE_LINE);
     }
 }
