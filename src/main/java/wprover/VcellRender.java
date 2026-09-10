@@ -12,6 +12,7 @@ import javax.swing.border.LineBorder;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.*;
+import java.util.List;
 import java.util.Vector;
 
 import static wprover.GExpert.getLanguage;
@@ -176,7 +177,7 @@ class BookCellRenderer extends VcellRender implements TreeCellRenderer {
                 }
             } else if (userObject instanceof ElTerm) {
                 ElTerm el = (ElTerm) userObject;
-                Vector v = el.getAllxterm();
+                List<Object> v = el.getAllxterm();
                 int k = 0;
                 if (node.getParent() != null) {
                     setLabelObject1(k++, 0, getLanguage("because"));
@@ -445,7 +446,7 @@ class BasicCellEditor extends AbstractCellEditor implements TreeCellEditor {
                 }
             } else if (userObject instanceof ElTerm) {
                 ElTerm el = (ElTerm) userObject;
-                Vector v = el.getAllxterm();
+                List<Object> v = el.getAllxterm();
                 int k = 0;
                 if (node.getParent() != null) {
                     setLabelObject1(k++, 0, getLanguage("because"));

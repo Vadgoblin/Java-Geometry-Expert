@@ -6,6 +6,7 @@ import gprover.Prover;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -172,7 +173,7 @@ public class FactFinderDialog extends JBaseDialog implements ActionListener, Ite
         if (o3 != null)
             s3 = o3.toString();
 
-        Vector v = null;
+        List<Object> v;
         if (src == bsearch) {
             v = Prover.search_a_fact(find_type, s1, s2, s3);
             if (v.size() == 0) {

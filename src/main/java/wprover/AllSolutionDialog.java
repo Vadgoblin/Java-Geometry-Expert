@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.List;
 import java.util.Vector;
 /**
  * The `AllSolutionDialog` class provides a dialog for displaying and interacting with
@@ -119,7 +120,7 @@ public class AllSolutionDialog extends JBaseDialog implements ActionListener, Wi
      *
      * @param v A vector containing the solutions.
      */
-    public void setVlist(Vector v) {
+    public void setVlist(List<Object> v) {
         vblist.clear();
         vlist.clear();
 

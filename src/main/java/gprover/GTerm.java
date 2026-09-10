@@ -2,6 +2,7 @@ package gprover;
 
 import javax.swing.*;
 import java.io.*;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -488,7 +489,7 @@ public class GTerm {
      *
      * @param v the vector containing new constraints
      */
-    public void addConsV(Vector v) {
+    public void addConsV(List<Object> v) {
         this.clear();
         gcons.addAll(v);
     }
