@@ -220,8 +220,8 @@ public class CTrace extends CClass {
      */
     public void move(double dx, double dy) {
         for (int i = 0; i < Num; i++) {
-            PX[i] += dx;
-            PY[i] += dy;
+            PX[i] += (int)Math.round(dx);
+            PY[i] += (int)Math.round(dy);
         }
     }
 
