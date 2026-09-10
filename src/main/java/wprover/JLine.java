@@ -151,10 +151,8 @@ public class JLine {
             if (p.getx() < p1.getx()) {
                 if (p2 == null) {
                     p2 = p1;
-                    p1 = p;
-                } else {
-                    p1 = p;
                 }
+                p1 = p;
             } else if (p2 == null || p.getx() > p2.getx()) {
                 p2 = p;
             }
@@ -171,10 +169,8 @@ public class JLine {
                 if (p.gety() < p1.gety()) {
                     if (p2 == null) {
                         p2 = p1;
-                        p1 = p;
-                    } else {
-                        p1 = p;
                     }
+                    p1 = p;
                 } else if (p2 == null || p.gety() > p2.gety()) {
                     p2 = p;
                 }
