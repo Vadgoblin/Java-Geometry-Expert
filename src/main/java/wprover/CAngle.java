@@ -1,12 +1,15 @@
 package wprover;
 
 import java.awt.*;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Line2D;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
 
 import gprover.Cm;
+import org.apache.batik.ext.awt.geom.Polygon2D;
 
 /**
  * Class representing an angle in a geometric construction.
@@ -20,7 +23,8 @@ public class CAngle extends CClass {
     int radius = 20;
     private int show_type = -1; // 0: none  1: value ; 2:text , -1: default, 3: name with walue;
     private int value1; // 0. Color or Num of Arc
-    private int ftype = CMisc.ANGLE_TYPE;  //// 0: traditional ;  1: Full angle, 2: Multiple arc, 3. Fill.
+    private int ftype = CMisc.ANGLE_TYPE;
+    /// / 0: traditional ;  1: Full angle, 2: Multiple arc, 3. Fill.
 
     CText ptext;
 
@@ -36,6 +40,7 @@ public class CAngle extends CClass {
 
     /**
      * Set the value for the angle.
+     *
      * @param c The value to set.
      */
     public void setValue1(int c) {
@@ -44,6 +49,7 @@ public class CAngle extends CClass {
 
     /**
      * Get the type of text to display for the angle.
+     *
      * @return The type of text.
      */
     public int getTextType() {
@@ -52,6 +58,7 @@ public class CAngle extends CClass {
 
     /**
      * Set the type of text to display for the angle.
+     *
      * @param n The type of text to set.
      */
     public void setTextType(int n) {
@@ -60,6 +67,7 @@ public class CAngle extends CClass {
 
     /**
      * Get the value of the angle.
+     *
      * @return The value of the angle.
      */
     public int getValue1() {
@@ -68,6 +76,7 @@ public class CAngle extends CClass {
 
     /**
      * Set the type of the angle.
+     *
      * @param n The type of the angle to set.
      */
     public void setAngleType(int n) {
@@ -76,6 +85,7 @@ public class CAngle extends CClass {
 
     /**
      * Get the type of the angle.
+     *
      * @return The type of the angle.
      */
     public int getAngleType() {
@@ -89,6 +99,7 @@ public class CAngle extends CClass {
 
     /**
      * Check if two angles are the same.
+     *
      * @param p1 Point 1 of angle 1.
      * @param p2 Point 2 of angle 1.
      * @param p3 Point 1 of angle 2.
@@ -473,9 +484,9 @@ public class CAngle extends CClass {
     /**
      * Draws an auxiliary line from a point to the perimeter of the angle.
      *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
-     * @param p the first point
+     * @param x  the x-coordinate
+     * @param y  the y-coordinate
+     * @param p  the first point
      * @param p1 the second point
      * @param p2 the third point
      * @param g2 the Graphics2D object
@@ -509,14 +520,14 @@ public class CAngle extends CClass {
         }
         g2.setColor(Color.red);
         g2.setStroke(CMisc.DashedStroke);
-        g2.drawLine((int) dx1, (int) dy1, (int) xf, (int) yf);
+        drawLine(g2, dx1, dy1,xf, yf);
     }
 
     /**
      * Draws an auxiliary line for the angle.
      *
-     * @param x the x-coordinate
-     * @param y the y-coordinate
+     * @param x  the x-coordinate
+     * @param y  the y-coordinate
      * @param g2 the Graphics2D object
      */
     public void drawauxLine(double x, double y, Graphics2D g2) {
@@ -541,9 +552,9 @@ public class CAngle extends CClass {
             g2.setColor(Color.red);
             g2.setStroke(CMisc.DashedStroke);
             if (!lstart.inside(x, y))
-                g2.drawLine((int) x, (int) y, (int) p1.getx(), (int) p1.gety());
+                drawLine(g2, x, y, p1.getx(), p1.gety());
             if (!lend.inside(x, y))
-                g2.drawLine((int) x, (int) y, (int) p2.getx(), (int) p2.gety());
+                drawLine(g2, x, y, p2.getx(), p2.gety());
         }
         drawauxLine1(x, y, pstart, pl1[0], pl1[1], g2);
         drawauxLine1(x, y, pend, pl2[0], pl2[1], g2);
@@ -562,7 +573,7 @@ public class CAngle extends CClass {
     /**
      * Draws the angle with the option to highlight if selected.
      *
-     * @param g2 the Graphics2D object
+     * @param g2         the Graphics2D object
      * @param isSelected true if the angle is selected, false otherwise
      */
     public void draw(Graphics2D g2, boolean isSelected) {
@@ -612,11 +623,6 @@ public class CAngle extends CClass {
             dr = dr - 360;
         else if (dr < -180) dr = dr + 360;
 
-//        if (dr >= 0)
-//            dr += 0.5;
-//        else dr -= 0 / 5;
-
-
         double rc = dr * Math.PI / (360);
         double cx = (dx1 * Math.cos(rc) - dy1 * Math.sin(rc)) * (radius + 6) + r[0];
         double cy = -(dy1 * Math.cos(rc) + dx1 * Math.sin(rc)) * (radius + 6) + r[1];
@@ -627,7 +633,7 @@ public class CAngle extends CClass {
 
         if (isSelected) {
             setDrawSelect(g2);
-            g2.drawArc((int) r[0] - radius, (int) r[1] - radius, radius * 2, radius * 2, (int) ri1, (int) dr);
+            drawArc(g2,r[0] - radius, r[1] - radius, radius * 2, radius * 2, ri1, dr);
             return;
         } else
             super.setDraw(g2);
@@ -672,25 +678,25 @@ public class CAngle extends CClass {
             g2.fillPolygon(xp, yp, 4);
         }
 
-        int x = (int) r[0] - radius;
-        int y = (int) r[1] - radius;
-        int w = radius * 2;
+        double x = r[0] - radius;
+        double y = r[1] - radius;
+        double w = radius * 2;
 
 
         if (ftype == 2) {
             for (int i = 1; i < value1; i++) {
-                g2.drawArc(x + i * 4, y + i * 4, w - i * 8, w - i * 8, (int) ri1, (int) dr);
+                drawArc(g2, x + i * 4, y + i * 4, w - i * 8, w - i * 8, ri1,dr);
             }
         } else if (ftype == 3) {
             Composite ac = g2.getComposite();
             g2.setComposite(CMisc.getFillComposite());
 
             g2.setColor(DrawData.getColor(value1));
-            g2.fillArc(x, y, w, w, (int) ri1, (int) dr);
+            fillArc(g2, x, y, w, w, ri1, dr);
             g2.setComposite(ac);
             g2.setColor(super.getColor());
         }
-        g2.drawArc(x, y, w, w, (int) ri1, (int) dr);
+        drawArc(g2, x, y, w, w, (int) ri1, (int) dr);
 
 
         if (CMisc.show_angle_text) {
@@ -727,7 +733,7 @@ public class CAngle extends CClass {
     /**
      * Saves the angle to a PostScript file.
      *
-     * @param fp the file output stream
+     * @param fp    the file output stream
      * @param stype the show type
      * @throws IOException if an I/O error occurs
      */
@@ -1039,6 +1045,44 @@ public class CAngle extends CClass {
                 value1 = in.readInt();
             }
         }
+    }
+
+     //
+     // Graphics helpers todo: move to dedicated class?
+     //
+
+    private static final Arc2D.Double REUSABLE_ARC = new Arc2D.Double();
+
+    /**
+     * Draws an arch to the argument graphics object
+     */
+    private static void drawArc(Graphics2D g2, double x, double y, double w, double h, double sa, double aa) {
+        REUSABLE_ARC.setArc(x, y, w, h, sa, aa, Arc2D.OPEN);
+        g2.draw(REUSABLE_ARC);
+    }
+
+    /**
+     * Fills an arch to the argument graphics object
+     */
+    private static void fillArc(Graphics2D g2, double x, double y, double w, double h, double sa, double aa) {
+        REUSABLE_ARC.setArc(x, y, w, h, sa, aa, Arc2D.OPEN);
+        g2.fill(REUSABLE_ARC);
+    }
+
+    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
+
+    /**
+     * Draws a line to the argument graphics object
+     *
+     * @param g2 the Graphics2D instance to draw to
+     * @param x1 the x coorditante of the start point
+     * @param y1 the y coorditante of the start point
+     * @param x2 the x coorditante of the end point
+     * @param y2 the y coorditante of the end point
+     */
+    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
+        REUSABLE_LINE.setLine(x1, y1, x2, y2);
+        g2.draw(REUSABLE_LINE);
     }
 }
 
