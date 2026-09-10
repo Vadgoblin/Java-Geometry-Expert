@@ -94,7 +94,7 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
 
         while (p1 != null) {
             TMono t = p1.poly;
-            vt.add(0, t);
+            vt.addFirst(t);
             if (t.x == m1.x)
                 break;
             p1 = p1.next;
@@ -105,10 +105,7 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
         long time = System.currentTimeMillis();
         int i = 0;
         addString("R_" + index + " = [" + poly.printHead(m1) + ", " + poly.plength(m1) + "]");
-        while (true) {
-            if (i >= vt.size())
-                break;
-
+        while (i < vt.size()) {
             TMono m = (TMono) vt.get(i++);
             TMono md = poly.pcopy(m);
             m1 = poly.prem(m1, md);
@@ -143,9 +140,7 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
      * @return the TMono representation of the construction
      */
     public TMono getTMono(Cons c) {
-        TMono m = dp.getTMono(c);
-
-        return m;
+        return dp.getTMono(c);
     }
 
     /**
@@ -171,8 +166,8 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
         TPoly pp = null;
         List<Object> vc = dp.getAllConstraint();
         int n = 1;
-        for (int i = 0; i < vc.size(); i++) {
-            Constraint c = (Constraint) vc.get(i);
+        for (Object o : vc) {
+            Constraint c = (Constraint) o;
             if (c.is_poly_genereate) {
                 c.PolyGenerate();
                 TPoly p1 = Constraint.getPolyListAndSetNull();
@@ -202,12 +197,10 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
         addString(poly.printSPoly(mc));
 
         addString2(GExpert.getLanguage("Successive Pseudo Remainder of the conclusion wrt Triangulized Hypotheses:"));
-        int r = 0;
+        int r;
 
         try {
-            if (mc != null) {
-                r = div(mc, dp.getPolyList());
-            }
+            r = div(mc, dp.getPolyList());
         } catch (final java.lang.OutOfMemoryError e) {
             running = false;
             JOptionPane.showMessageDialog(PanelWu.this, GExpert.getLanguage("System Run Out Of Memory") + "\n" +
