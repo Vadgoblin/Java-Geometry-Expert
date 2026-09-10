@@ -5855,7 +5855,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
                 poly.setDraggedPointsNull();
             } else {
                 if (SelectList.size() == 1) {
-                    Vector v = poly.getDraggedPoints();
+                    List<Object> v = poly.getDraggedPoints();
                     boolean already = false;
                     for (int i = 0; i < v.size() / 2; i++) {
                         if (v.get(i * 2) == pt) {
@@ -6228,7 +6228,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
      */
     public void add_free_transform() {
         CPolygon p = (CPolygon) SelectList.get(0);
-        Vector v = p.getTransformedPoints();
+        List<Object> v = p.getTransformedPoints();
         CPolygon p1 = new CPolygon();
         p1.copy(p);
         p1.setPoints(v);
@@ -6325,7 +6325,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
      * @param v the vector of points
      * @return the matching polygon, or null if no match is found
      */
-    public CPolygon findPolygon(Vector v) {
+    public CPolygon findPolygon(List<Object> v) {
         for (int i = 0; i < polygonlist.size(); i++) {
             CPolygon p = (CPolygon) polygonlist.get(i);
             if (p.check_eq(v))
@@ -7321,7 +7321,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
      * @param dx   the delta x value
      * @param dy   the delta y value
      */
-    public void objectsListMoved(Vector list, double dx, double dy) {
+    public void objectsListMoved(List<Object> list, double dx, double dy) {
         for (int i = 0; i < list.size(); i++) {
             CClass c = (CClass) list.get(i);
             int t = c.get_type();
