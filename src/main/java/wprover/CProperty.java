@@ -9,7 +9,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.*;
 import java.net.URL;
-import java.util.EventObject;
 
 /**
  * CProperty is a JPanel that displays property panels for different geometric objects.
@@ -626,7 +625,7 @@ public class CProperty extends JPanel implements ActionListener {
                 Double d = Double.parseDouble(data.toString());
                 pt.setXY(pt.getx(), d.doubleValue());
             } else if (row == 4) {
-                pt.setFreezed(Boolean.parseBoolean(data.toString()));
+                pt.setFrozen(Boolean.parseBoolean(data.toString()));
             }
             d.repaint();
 
@@ -639,7 +638,7 @@ public class CProperty extends JPanel implements ActionListener {
             table.setValueAt(p.getRadiusValue(), 1, 1);
             table.setValueAt(round(p.getx()), 2, 1);
             table.setValueAt(round(p.gety()), 3, 1);
-            table.setValueAt(pt.isFreezed(), 4, 1);
+            table.setValueAt(pt.isFrozen(), 4, 1);
             border.setTitle(p.TypeString());
 
         }

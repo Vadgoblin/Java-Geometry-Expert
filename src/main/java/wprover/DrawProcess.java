@@ -7241,7 +7241,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
             switch (t) {
                 case CClass.POINT:
                     CPoint p = (CPoint) c;
-                    if (!p.isFreezed())
+                    if (!p.isFrozen())
                         p.setXY(x, y);
                     return;
                 case CClass.LINE:
@@ -7307,7 +7307,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
     private void circleLocationChanged(Circle c, double dx, double dy) {
         Circle c1 = (Circle) c;
         CPoint p1 = c1.o;
-        if (!p1.isFreezed())
+        if (!p1.isFrozen())
             p1.setXY(p1.getx() + dx, p1.gety() + dy);
         objectsListMoved(c1.points, dx, dy);
         return;
@@ -7327,7 +7327,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
             switch (t) {
                 case CClass.POINT:
                     CPoint p = (CPoint) c;
-                    if (!p.isFreezed())
+                    if (!p.isFrozen())
                         p.setXY(p.getx() + dx, p.gety() + dy);
                     break;
             }

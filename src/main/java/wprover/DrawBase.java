@@ -1962,7 +1962,7 @@ public class DrawBase {
     public boolean containFreezedPoint() {
         for (int i = 0; i < pointlist.size(); i++) {
             CPoint p = (CPoint) pointlist.get(i);
-            if (p.isFreezed()) {
+            if (p.isFrozen()) {
                 return true;
             }
         }
@@ -1975,8 +1975,8 @@ public class DrawBase {
     public void unfreezeAllPoints() {
         for (int i = 0; i < pointlist.size(); i++) {
             CPoint p = (CPoint) pointlist.get(i);
-            if (p.isFreezed()) {
-                p.setFreezed(false);
+            if (p.isFrozen()) {
+                p.setFrozen(false);
             }
         }
     }
@@ -1989,7 +1989,7 @@ public class DrawBase {
     public boolean isFrozen() {
         for (int i = 0; i < pointlist.size(); i++) {
             CPoint p = (CPoint) pointlist.get(i);
-            if (p.isFreezed()) {
+            if (p.isFrozen()) {
                 gxInstance.setTextLabel2(GExpert.getLanguage("The diagram is frozen, use right click menu to unfreeze!"));
                 return true;
             }

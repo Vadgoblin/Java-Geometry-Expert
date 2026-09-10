@@ -22,7 +22,7 @@ public class CPoint extends CClass {
     private List<Constraint> cons = new ArrayList<Constraint>();
     boolean hasSetColor = false;
     int m_radius = -1; //default.
-    private boolean freezed = false;
+    private boolean frozen = false;
     CText ptext;
 
 
@@ -473,8 +473,8 @@ public class CPoint extends CClass {
      *
      * @return true if the point is frozen, false otherwise
      */
-    public boolean isFreezed() {
-        return freezed;
+    public boolean isFrozen() {
+        return frozen;
     }
 
     /**
@@ -482,8 +482,8 @@ public class CPoint extends CClass {
      *
      * @param r the new frozen state
      */
-    public void setFreezed(boolean r) {
-        freezed = r;
+    public void setFrozen(boolean r) {
+        frozen = r;
     }
 
     /**
@@ -613,7 +613,7 @@ public class CPoint extends CClass {
         }
         out.writeBoolean(visible);
         out.writeInt(m_radius);
-        out.writeBoolean(freezed);
+        out.writeBoolean(frozen);
     }
 
     /**
@@ -683,7 +683,7 @@ public class CPoint extends CClass {
             else
                 m_radius = -1;// default.
             if (CMisc.version_load_now >= 0.050)
-                freezed = in.readBoolean();
+                frozen = in.readBoolean();
         }
     }
 }
