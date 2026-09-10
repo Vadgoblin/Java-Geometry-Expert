@@ -1,7 +1,6 @@
 package gprover;
 
 import java.util.List;
-import java.util.Vector;
 
 /**
  * The Prover class provides static methods for performing geometric proofs and computations.
