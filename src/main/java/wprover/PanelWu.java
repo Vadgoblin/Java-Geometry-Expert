@@ -3,8 +3,8 @@ package wprover;
 import gprover.*;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.*;
@@ -90,7 +90,7 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
     protected int div(TMono m1, TPoly p1) {
         if (poly.pzerop(m1))
             return 0;
-        Vector vt = new Vector();
+        List<Object>  vt = new ArrayList<>();
 
         while (p1 != null) {
             TMono t = p1.poly;

@@ -3,8 +3,8 @@ package wprover;
 import gprover.Cm;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -19,8 +19,8 @@ public class ConcPanel extends JPanel implements ActionListener, ItemListener {
     public static ImageIcon icon_Question = GExpert.createImageIcon("images/dtree/question.gif");
 
     private JComboBox bt;
-    private Vector vlist = new Vector();
-    private Vector vlist1 = new Vector();
+    private List<Object>  vlist = new ArrayList<>();
+    private List<Object>  vlist1 = new ArrayList<>();
     private JLabel ltext1;
     private JButton bbok, bbcancel;
     private JPanel bpanel;

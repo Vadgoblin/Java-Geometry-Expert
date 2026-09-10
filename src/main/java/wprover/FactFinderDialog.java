@@ -7,7 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * FactFinderDialog is a dialog that allows users to search for geometric facts based on selected points and types.

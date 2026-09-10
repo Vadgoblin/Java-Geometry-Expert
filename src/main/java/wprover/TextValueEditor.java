@@ -10,7 +10,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * TextValueEditor is a dialog for editing mathematical expressions.

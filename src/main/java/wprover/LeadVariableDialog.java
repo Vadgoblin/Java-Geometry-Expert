@@ -10,7 +10,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
@@ -27,7 +26,7 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
     private JTable table;
     private LVTableModel model;
     private InspectPanel ipane = null;
-    private Vector vdata = new Vector();
+    private List<Object>  vdata = new ArrayList<>();
     private GExpert gxInstance;
     private JButton bdtail;
     protected static GeoPoly poly = GeoPoly.getPoly();
@@ -233,7 +232,7 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
 
         int n = table.getSelectedRow();
         if (n < 0 || n >= model.getRowCount()) return;
-        Vector v = (Vector) vdata.get(n);
+        List<Object>  v = (ArrayList) vdata.get(n);
 
         Object p = getPoints(n);
 
@@ -256,7 +255,7 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
     public Object getPoints(int n) {
         if (n % 2 != 0)
             n -= 1;
-        Vector v1 = (Vector) vdata.get(n);
+        List<Object>  v1 = (ArrayList) vdata.get(n);
         return v1.get(0);
     }
 
@@ -298,7 +297,7 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
         }
 
         public Object getValueAt(int row, int col) {
-            Vector v = (Vector) vdlist.get(row);
+            List<Object>  v = (ArrayList) vdlist.get(row);
             return v.get(col);
         }
 
@@ -377,7 +376,7 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
             }
         }
 
-        public void loadValue(int n, Object o, Vector v) {
+        public void loadValue(int n, Object o, List<Object>  v) {
             Object o1 = o;
             Object o2 = v.get(1);
             Object o3 = v.get(2);
@@ -503,12 +502,12 @@ public class LeadVariableDialog extends JBaseDialog implements MouseListener, Ac
      * It extends DefaultTableModel and provides methods to manage the data displayed in the table.
      */
     class ndgModel extends DefaultTableModel {
-        private Vector vlist = new Vector();
+        private List<Object>  vlist = new ArrayList<>();
 
         public ndgModel() {
         }
 
-        public void setDatalist(Vector v) {
+        public void setDatalist(List<Object>  v) {
             vlist.addAll(v);
         }
 
