@@ -323,11 +323,7 @@ public class CTrace extends CClass {
     public void addTracePoint(int i, double x, double y) {
         PX[i] = (int) x;
         PY[i] = (int) y;
-        if (x < 0 || y < 0) {
-            int k = 0;
-        }
         soft(i);
-
     }
 
     /**
