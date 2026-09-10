@@ -1,7 +1,8 @@
 package wprover;
 
 import java.awt.*;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * JLine class represents a line in a graphical context.
@@ -10,7 +11,7 @@ import java.util.Vector;
 public class JLine {
     private boolean ext = false;
 
-    Vector vlist = new Vector();
+    List<CPoint> vlist = new ArrayList<>();
 
     /**
      * Constructs a new JLine.
@@ -164,10 +165,10 @@ public class JLine {
         }
 
         if (Math.abs(p1.getx() - p2.getx()) < 0.00001) {
-            p1 = (CPoint) vlist.get(0);
+            p1 = vlist.getFirst();
             p2 = null;
             for (int i = 1; i < vlist.size(); i++) {
-                CPoint p = (CPoint) vlist.get(i);
+                CPoint p = vlist.get(i);
                 if (p.gety() < p1.gety()) {
                     if (p2 == null) {
                         p2 = p1;
