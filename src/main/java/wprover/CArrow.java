@@ -1,6 +1,7 @@
 package wprover;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.DataOutputStream;
@@ -110,12 +111,12 @@ public class CArrow extends CClass {
         }
         //   g2.drawLine((int) x1, (int) y1, (int) (xx1 + 8 * dy), (int) (yy1 - 8 * dx));
         //   g2.drawLine((int) x2, (int) y2, (int) (xx2 + 8 * dy), (int) (yy2 - 8 * dx));
-        g2.drawLine((int) xx1, (int) yy1, (int) px1, (int) py1);
-        g2.drawLine((int) xx1, (int) yy1, (int) px2, (int) py2);
+        drawLine(g2, xx1, yy1, px1, py1);
+        drawLine(g2, xx1, yy1, px2, py2);
         //      g2.drawLine((int) xx2, (int) yy2, (int) qx1, (int) qy1);
         //      g2.drawLine((int) xx2, (int) yy2, (int) qx2, (int) qy2);
 
-        g2.drawLine((int) xx1, (int) yy1, (int) xx2, (int) yy2);
+        drawLine(g2, xx1, yy1, xx2, yy2);
         g2.setColor(Color.black);
     }
 
@@ -218,6 +219,22 @@ public class CArrow extends CClass {
         length = in.readInt();
     }
 
+
+    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
+
+    /**
+     * Draws a line to the argument graphics object
+     *
+     * @param g2 the Graphics2D instance to draw to
+     * @param x1 the x coorditante of the start point
+     * @param y1 the y coorditante of the start point
+     * @param x2 the x coorditante of the end point
+     * @param y2 the y coorditante of the end point
+     */
+    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
+        REUSABLE_LINE.setLine(x1, y1, x2, y2);
+        g2.draw(REUSABLE_LINE);
+    }
 }
 
 
