@@ -4,7 +4,8 @@ import javax.swing.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.*;
-import java.util.Vector;
+import java.util.Arrays;
+import java.util.ArrayList;
 
 /**
  * A class that represents a flashing effect for graphical objects.
@@ -12,7 +13,7 @@ import java.util.Vector;
 public class JObjectFlash extends JFlash implements ActionListener {
     private static int TIMERS = 130;
     private static int MAXFLASHTIMES = 12;
-    private Vector vlist;
+    private java.util.List<Object> vlist;
     private int count = 0;
 
     /**
@@ -23,7 +24,7 @@ public class JObjectFlash extends JFlash implements ActionListener {
     public JObjectFlash(JPanel p) {
         super(p);
         panel = p;
-        vlist = new Vector();
+        vlist = new ArrayList<>();
         timer = new Timer(TIME_INTERVAL, this);
         vType = true;
     }
@@ -61,7 +62,7 @@ public class JObjectFlash extends JFlash implements ActionListener {
      * @param v       the list of objects
      * @param inflash true to enable flashing mode, false to disable
      */
-    private void setListInFlashing(Vector v, boolean inflash) {
+    private void setListInFlashing(java.util.List<Object> v, boolean inflash) {
         for (int i = 0; i < v.size(); i++) {
             CClass cc = (CClass) v.get(i);
             cc.setInFlashing(inflash);
@@ -73,7 +74,7 @@ public class JObjectFlash extends JFlash implements ActionListener {
      *
      * @param v the list of objects
      */
-    private void stopListFlash(Vector v) {
+    private void stopListFlash(java.util.List<Object> v) {
         for (int i = 0; i < v.size(); i++) {
             CClass cc = (CClass) v.get(i);
             cc.stopFlash();

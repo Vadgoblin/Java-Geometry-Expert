@@ -7,8 +7,8 @@ import javax.swing.*;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.border.LineBorder;
 import javax.swing.border.Border;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -722,7 +722,7 @@ public class MProveInputPanel extends JToolBar implements ActionListener {
 
         private JComboBox box;
         int pnum = 0;
-        private Vector vlist = new Vector();
+        private List<Object> vlist = new ArrayList<>();
         private MDrObj dobj;
         private JLabel labelx;
 
@@ -961,7 +961,7 @@ public class MProveInputPanel extends JToolBar implements ActionListener {
      */
     class CommonEquationPanel extends JPanel implements ActionListener {
 
-        private Vector vlist = new Vector();
+        private List<Object> vlist = new ArrayList<>();
         private JPanel topPane;
         private JPanel pbottom;
         private MEquation eq;

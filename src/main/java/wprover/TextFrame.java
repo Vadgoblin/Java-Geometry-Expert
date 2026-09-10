@@ -7,10 +7,12 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.ClipboardOwner;
 import java.awt.datatransfer.Transferable;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.io.IOException;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.UnsupportedFlavorException;
+import java.util.List;
 
 
 /**
@@ -30,7 +32,7 @@ public class TextFrame extends JBaseDialog implements ItemListener,
     String fontchoice = "fontchoice";
     int stChoice = 0;
     String siChoice = "10";
-    Vector fontfamily;
+    List<Object> fontfamily;
     //    Font defaultFont = new Font("Dialog", Font.PLAIN, 16);
     GExpert gxInstance;
 
@@ -60,10 +62,10 @@ public class TextFrame extends JBaseDialog implements ItemListener,
 
         Font cfont = new Font("Dialog", Font.PLAIN, 16);
 
-        fontfamily = new Vector();
+        fontfamily = new ArrayList<>();
         for (int i = 1; i < envfonts.length; i++)
-            fontfamily.addElement(envfonts[i]);
-        fonts = new JComboBox(fontfamily);
+            fontfamily.add(envfonts[i]);
+        fonts = new JComboBox(fontfamily.toArray());
         fonts.setFont(tf);
 
         fonts.setMaximumRowCount(9);

@@ -10,7 +10,6 @@ import javax.swing.event.ChangeEvent;
 import java.awt.event.*;
 import java.awt.*;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * PPDialog is a class that extends JBaseDialog and implements ActionListener,
