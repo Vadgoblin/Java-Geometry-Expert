@@ -86,11 +86,10 @@ public class JLine {
      * @param g2 the Graphics2D context to draw on
      */
     public void drawPt(Graphics2D g2) {
-        for (int i = 0; i < vlist.size(); i++) {
-            CPoint pt = (CPoint) vlist.get(i);
-            double x = pt.getx();
-            double y = pt.gety();
-            int r = pt.getRadius();
+        for (CPoint cPoint : vlist) {
+            double x = cPoint.getx();
+            double y = cPoint.gety();
+            int r = cPoint.getRadius();
             ShapeDrawer.drawEllipse(g2, x - r - 1, y - r - 1, 2 * r + 1, 2 * r + 1);
         }
     }
@@ -102,11 +101,10 @@ public class JLine {
      */
     public void fillPt(Graphics2D g2) {
         g2.setColor(Color.white);
-        for (int i = 0; i < vlist.size(); i++) {
-            CPoint pt = (CPoint) vlist.get(i);
-            int x = (int) pt.getx();
-            int y = (int) pt.gety();
-            int r = pt.getRadius();
+        for (CPoint cPoint : vlist) {
+            int x = (int) cPoint.getx();
+            int y = (int) cPoint.gety();
+            int r = cPoint.getRadius();
             g2.fillOval(x - r - 1, y - r - 1, 2 * r + 1, 2 * r + 1);
         }
     }
@@ -117,9 +115,8 @@ public class JLine {
      * @param t true to enable flashing mode, false to disable
      */
     public void setInFlashMode(boolean t) {
-        for (int i = 0; i < vlist.size(); i++) {
-            CPoint pt = (CPoint) vlist.get(i);
-            pt.setInFlashing(t);
+        for (CPoint cPoint : vlist) {
+            cPoint.setInFlashing(t);
         }
     }
 
@@ -144,14 +141,14 @@ public class JLine {
         }
 
         CPoint p1, p2;
-        p1 = (CPoint) vlist.get(0);
+        p1 = vlist.getFirst();
         if (p1 == null) {
             return null;
         }
 
         p2 = null;
         for (int i = 1; i < vlist.size(); i++) {
-            CPoint p = (CPoint) vlist.get(i);
+            CPoint p = vlist.get(i);
             if (p.getx() < p1.getx()) {
                 if (p2 == null) {
                     p2 = p1;
@@ -164,6 +161,9 @@ public class JLine {
             }
         }
 
+        if(p2 == null){
+            return null;
+        }
         if (Math.abs(p1.getx() - p2.getx()) < 0.00001) {
             p1 = vlist.getFirst();
             p2 = null;
