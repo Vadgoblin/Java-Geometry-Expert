@@ -12,6 +12,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.print.*;
 import java.io.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -11169,7 +11170,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
      * @param pc1 the starting ID
      * @param pc2 the ending ID
      */
-    public void moveUndoObjectFromList(Vector v1, Vector v2, int pc1, int pc2) {
+    public void moveUndoObjectFromList(List<Object> v1, List<Object> v2, int pc1, int pc2) {
         for (int i = 0; i < v2.size(); i++) {
             CClass cc = (CClass) v2.get(i);
             if (cc.m_id >= pc1 && cc.m_id < pc2) {
@@ -11188,7 +11189,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
      * @param pc1 the starting ID
      * @param pc2 the ending ID
      */
-    public void selectUndoObjectFromList(Vector v1, Vector v2, int pc1, int pc2) {
+    public void selectUndoObjectFromList(List<Object> v1, List<Object> v2, int pc1, int pc2) {
         for (int i = 0; i < v2.size(); i++) {
             CClass cc = (CClass) v2.get(i);
             if (cc.m_id >= pc1 && cc.m_id < pc2) {
@@ -11211,7 +11212,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
 
         undo = u;
         if ((u != null && u.flash) || compulsory_flash) {
-            Vector v = u.getAllObjects(this);
+            List<Object> v = u.getAllObjects(this);
             JObjectFlash f = new JObjectFlash(panel);
             f.setAt(panel, v);
             this.addFlash(f);
@@ -11264,7 +11265,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
      * @param list the list of objects to be flashed
      * @param p    the panel on which the flash effect should be displayed
      */
-    public void setObjectListForFlash(Vector list, JPanel p) {
+    public void setObjectListForFlash(List<Object> list, JPanel p) {
 
         JObjectFlash f = new JObjectFlash(panel);
         f.setAt(p, list);
@@ -11276,7 +11277,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
      *
      * @param list the list of objects to be flashed
      */
-    public void setObjectListForFlash(Vector list) {
+    public void setObjectListForFlash(List<Object> list) {
         setObjectListForFlash(list, panel);
     }
 

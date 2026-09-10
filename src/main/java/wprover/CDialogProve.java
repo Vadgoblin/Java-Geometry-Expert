@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Vector;
 import java.io.File;
 import java.util.Arrays;
@@ -360,7 +361,7 @@ class ProvePane extends JPanel
         captainField.setText(cp.getHead());
         proveField.setText(cp.getMessage());
         proveField.setForeground(cp.getMessageColor());
-        Vector v = cp.getObjectList();
+        List<Object> v = cp.getObjectList();
         vlist.clear();
 
         for (int i = 0; i < v.size(); i++) {

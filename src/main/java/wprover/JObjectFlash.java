@@ -86,7 +86,7 @@ public class JObjectFlash extends JFlash implements ActionListener {
      * @param p    the JPanel to associate with this JObjectFlash
      * @param list the list of objects to be flashed
      */
-    public void setAt(JPanel p, Vector list) {
+    public void setAt(JPanel p, java.util.List<Object> list) {
         panel = p;
         stopListFlash(vlist);
         vlist.clear();
