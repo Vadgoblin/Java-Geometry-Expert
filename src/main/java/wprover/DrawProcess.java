@@ -7915,7 +7915,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
         }
 
         if (ln1 != null) {
-            Vector v = ln1.points;
+            List<Object> v = ln1.points;
             if (ln2 == null) {
                 if (v.contains(p3)) {
                     return p3;
@@ -7924,7 +7924,7 @@ public class DrawProcess extends DrawBase implements Printable, ActionListener {
                     return p4;
                 }
             } else {
-                Vector v2 = ln2.points;
+                List<Object> v2 = ln2.points;
                 for (int i = 0; i < v2.size(); i++) {
                     if (v.contains(v2.get(i))) {
                         return (CPoint) v2.get(i);

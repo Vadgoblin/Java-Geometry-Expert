@@ -3,6 +3,7 @@ package wprover;
 import gprover.Gib;
 import gprover.Cons;
 
+import java.util.List;
 import java.util.Vector;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -1879,7 +1880,7 @@ public class Constraint {
             CLine ln = (CLine) this.getelement(2);
             Circle c = (Circle) this.getelement(3);
             CPoint o = c.o;
-            Vector pts = ln.points;
+            List<Object> pts = ln.points;
             for (int i = 0; i < pts.size(); i++)
                 if (pts.get(i) != pc) {
                     pl = (CPoint) pts.get(i);
