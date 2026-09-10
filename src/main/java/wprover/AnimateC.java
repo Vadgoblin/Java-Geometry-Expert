@@ -269,40 +269,49 @@ public class AnimateC {
      */
     public void reCalculate() {
         if (onType == 2) {
-            Circle c = (Circle) onObj;
-            CPoint pt = c.getSidePoint();
-            double rx = c.o.getx();
-            double ry = c.o.gety();
-            double r = Math.sqrt(Math.pow(pt.getx() - rx, 2) +
-                    Math.pow(pt.gety() - ry, 2));
+            double r = calculateR();
             csa = Math.cos(-gap / r);
             sia = Math.sin(-gap / r);
         } else if (onType == 1) {
             CLine line = (CLine) onObj;
             CPoint[] pp = line.getTowSideOfLine();
             if (line.isVertical()) {
-                dx = (pp[1].getx() - pp[0].getx());
-                dy = (pp[1].gety() - pp[0].gety());
-                double r = Math.sqrt(dx * dx + dy * dy);
-                dx = dx / r;
-                dy = dy / r;
+                updateDxDy(pp);
             } else {
                 if (pp[0] == pA) {
                     pp[0] = pp[1];
                     pp[1] = pA;
                 }
 
-                dx = (pp[1].getx() - pp[0].getx());
-                dy = (pp[1].gety() - pp[0].gety());
-                double r = Math.sqrt(dx * dx + dy * dy);
-                dx = dx / r;
-                dy = dy / r;
+                updateDxDy(pp);
             }
         } else if (onType == 3) {
 
         } else {
             CMisc.print("Error,undifined on type ");
         }
+    }
+
+    private double calculateR() {
+        Circle c = (Circle) onObj;
+        CPoint pt = c.getSidePoint();
+        double rx = c.o.getx();
+        double ry = c.o.gety();
+        return Math.sqrt(Math.pow(pt.getx() - rx, 2) +
+                Math.pow(pt.gety() - ry, 2));
+    }
+
+    /**
+     * Updates dx and dy based on the first 2 element of the argument CPoint list.
+     * @param pp an array of CPoints
+     */
+
+    private void updateDxDy(CPoint[] pp) {
+        dx = (pp[1].getx() - pp[0].getx());
+        dy = (pp[1].gety() - pp[0].gety());
+        double r = Math.sqrt(dx * dx + dy * dy);
+        dx = dx / r;
+        dy = dy / r;
     }
 
     /**
@@ -351,12 +360,7 @@ public class AnimateC {
      */
     public int getRounds() {
         if (onType == 2) {
-            Circle c = (Circle) onObj;
-            CPoint pt = c.getSidePoint();
-            double rx = c.o.getx();
-            double ry = c.o.gety();
-            double r = Math.sqrt(Math.pow(pt.getx() - rx, 2) +
-                    Math.pow(pt.gety() - ry, 2));
+            double r = calculateR();
             return (int) Math.abs(Math.PI * r * 2 / gap);
         } else if (onType == 1) {
             int n1 = (int) Math.abs((width - minWd) / (gap * dx));
@@ -488,8 +492,6 @@ public class AnimateC {
         step_time = in.readInt();
 
     }
-
-
 }
 
 
