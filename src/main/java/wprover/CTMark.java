@@ -1,6 +1,7 @@
 package wprover;
 
 import java.awt.*;
+import java.awt.geom.Line2D;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.DataOutputStream;
@@ -198,8 +199,8 @@ public class CTMark extends CClass {
             super.setDrawSelect(g2);
         }
 
-        g2.drawLine((int) (fx + dx), (int) (fy + dy), (int) (ex), (int) (ey));
-        g2.drawLine((int) (fx + dx1), (int) (fy + dy1), (int) (ex), (int) (ey));
+        drawLine(g2, (fx + dx), (fy + dy), ex, ey);
+        drawLine(g2, (fx + dx1),(fy + dy1),ex, ey);
 
         pos1x = (int) (fx + dx);
         pos1y = (int) (fy + dy);
@@ -242,5 +243,21 @@ public class CTMark extends CClass {
             length = in.readInt();
         else
             length = -1;
+    }
+
+    private static final Line2D.Double REUSABLE_LINE = new Line2D.Double();
+
+    /**
+     * Draws a line to the argument graphics object
+     *
+     * @param g2 the Graphics2D instance to draw to
+     * @param x1 the x coorditante of the start point
+     * @param y1 the y coorditante of the start point
+     * @param x2 the x coorditante of the end point
+     * @param y2 the y coorditante of the end point
+     */
+    private static void drawLine(Graphics2D g2, double x1, double y1, double x2, double y2) {
+        REUSABLE_LINE.setLine(x1, y1, x2, y2);
+        g2.draw(REUSABLE_LINE);
     }
 }
