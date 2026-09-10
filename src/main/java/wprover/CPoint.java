@@ -2,11 +2,13 @@ package wprover;
 
 import maths.Param;
 
-import java.util.Vector;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.DataInputStream;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.*;
 
 /**
@@ -17,7 +19,7 @@ import java.awt.*;
 public class CPoint extends CClass {
     private int type = 0;
     public Param x1, y1;
-    private Vector cons = new Vector();
+    private List<Constraint> cons = new ArrayList<Constraint>();
     boolean hasSetColor = false;
     int m_radius = -1; //default.
     private boolean freezed = false;
@@ -39,8 +41,8 @@ public class CPoint extends CClass {
       * @return the first Constraint object, or null if no constraints are present
       */
     public Constraint getConstraint() {
-        if (cons.size() == 0) return null;
-        return (Constraint) cons.get(0);
+        if (cons.isEmpty()) return null;
+        return cons.getFirst();
     }
 
      /**
@@ -107,7 +109,7 @@ public class CPoint extends CClass {
         if (obj == null) {
             return false;
         }
-        if (m_name == null || m_name.length() == 0) {
+        if (m_name == null || m_name.isEmpty()) {
             return false;
         }
         return m_name.equals(obj.toString());
