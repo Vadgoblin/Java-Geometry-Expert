@@ -64,7 +64,7 @@ public class JLine {
                     double x = pl[0].getx();
                     double y1 = 0;
                     double y2 = 2000;
-                    g2.drawLine((int) x, (int) y1, (int) x, (int) y2);
+                    ShapeDrawer.drawLine(g2, x,y1,x,y2);
                 } else {
                     double k = (pl[1].gety() - pl[0].gety()) /
                             (pl[1].getx() - pl[0].getx());
@@ -72,7 +72,7 @@ public class JLine {
                     double x2 = 2000;
                     double y1 = k * (0 - pl[0].getx()) + pl[0].gety();
                     double y2 = k * (x2 - pl[0].getx()) + pl[0].gety();
-                    g2.drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+                    ShapeDrawer.drawLine(g2, x1,y1,x2,y2);
                 }
             }
         }
