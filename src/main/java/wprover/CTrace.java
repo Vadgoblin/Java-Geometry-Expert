@@ -106,9 +106,7 @@ public class CTrace extends CClass {
      * @param n the number of points
      */
     public void setNumPts(int n) {
-        if (n < MAX_POINT)
-            Num = n;
-        else Num = MAX_POINT;
+        Num = Math.min(n, MAX_POINT);
     }
 
     /**
