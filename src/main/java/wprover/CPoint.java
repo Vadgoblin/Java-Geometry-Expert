@@ -132,11 +132,7 @@ public class CPoint extends CClass {
     public void setInFlashing(boolean flash) {
         super.setInFlashing(flash);
         if (ptext != null) {
-            if (flash) {
-                ptext.setInFlashing(true);
-            } else {
-                ptext.setInFlashing(false);
-            }
+            ptext.setInFlashing(flash);
         }
     }
 
@@ -176,7 +172,7 @@ public class CPoint extends CClass {
      * @return true if the point is selected, false otherwise
      */
     public boolean select(double x, double y) {
-        if (visible == false) {
+        if (!visible) {
             return false;
         }
 
@@ -388,9 +384,8 @@ public class CPoint extends CClass {
      * @return true if the coordinates are valid, false otherwise
      */
     public boolean check_xy_valid(double x, double y) {
-        for (int i = 0; i < cons.size(); i++) {
-            Constraint cs = (Constraint) cons.get(i);
-            if (!cs.check_constraint(x, y))
+        for (Constraint con : cons) {
+            if (!con.check_constraint(x, y))
                 return false;
         }
         return true;
@@ -403,11 +398,7 @@ public class CPoint extends CClass {
      * @return true if the points have the same coordinates, false otherwise
      */
     public boolean isEqual(CPoint p) {
-        if ((p.x1 == this.x1) && (p.y1 == this.y1)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (p.x1 == this.x1) && (p.y1 == this.y1);
     }
 
     /**
@@ -418,11 +409,7 @@ public class CPoint extends CClass {
      * @return true if the indices match this point's indices, false otherwise
      */
     public boolean isEqual(int x, int y) {
-        if ((x == this.x1.xindex) && (y == this.y1.xindex)) {
-            return true;
-        } else {
-            return false;
-        }
+        return (x == this.x1.xindex) && (y == this.y1.xindex);
     }
 
     /**
@@ -433,11 +420,8 @@ public class CPoint extends CClass {
      * @return true if the location matches this point's location, false otherwise
      */
     public boolean isSame_Location(double x, double y) {
-        if (Math.abs(x - this.getx()) < CMisc.ZERO &&
-                Math.abs(y - this.gety()) < CMisc.ZERO) {
-            return true;
-        }
-        return false;
+        return Math.abs(x - this.getx()) < CMisc.ZERO &&
+                Math.abs(y - this.gety()) < CMisc.ZERO;
     }
 
     /**
@@ -509,10 +493,8 @@ public class CPoint extends CClass {
      * @param y the new y-coordinate
      */
     public void setXY(double x, double y) {
-        if (true) {
-            x1.value = x;
-            y1.value = y;
-        }
+        x1.value = x;
+        y1.value = y;
     }
 
     /**
@@ -542,7 +524,7 @@ public class CPoint extends CClass {
     public void SavePS_Define_Point(FileOutputStream fp) throws IOException {
         String st = m_name;
 
-        if (st.length() == 0 || st.trim().length() == 0)
+        if (st.trim().isEmpty())
             st = "POINT" + m_id;
 
         String s = '/' + st + " {";
@@ -565,7 +547,7 @@ public class CPoint extends CClass {
      * @throws IOException if an I/O error occurs
      */
     public void SavePS(FileOutputStream fp, int stype) throws IOException {
-        if (visible == false) {
+        if (!visible) {
             return;
         }
 
@@ -576,7 +558,7 @@ public class CPoint extends CClass {
 
         String st = m_name;
 
-        if (st.length() == 0 || st.trim().length() == 0)
+        if (st.trim().isEmpty())
             st = "POINT" + m_id;
 
         s = st + " " + n + " cirfill fill " + st + " " + n + " cir black" + " stroke \n";
@@ -590,7 +572,7 @@ public class CPoint extends CClass {
      * @throws IOException if an I/O error occurs
      */
     public void SavePsOringinal(FileOutputStream fp) throws IOException {
-        if (visible == false) {
+        if (!visible) {
             return;
         }
 
@@ -599,7 +581,7 @@ public class CPoint extends CClass {
 
         String st = m_name;
 
-        if (st.length() == 0 || st.trim().length() == 0)
+        if (st.isEmpty() || st.trim().isEmpty())
             st = "POINT" + m_id;
 
         s = st + " " + n + " cirfill ";
@@ -656,7 +638,7 @@ public class CPoint extends CClass {
             }
 
             int len = in.readInt();
-            m_name = new String();
+            m_name = "";
             for (int i = 0; i < len; i++) {
                 m_name += in.readChar();
             }
