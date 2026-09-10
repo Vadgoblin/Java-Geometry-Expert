@@ -19,7 +19,7 @@ import java.awt.*;
 public class CPoint extends CClass {
     private int type = 0;
     public Param x1, y1;
-    private List<Constraint> cons = new ArrayList<Constraint>();
+    private final List<Constraint> cons = new ArrayList<>();
     boolean hasSetColor = false;
     int m_radius = -1; //default.
     private boolean frozen = false;
