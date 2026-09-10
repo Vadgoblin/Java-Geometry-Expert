@@ -4,12 +4,8 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
 import java.util.List;
-import java.util.Vector;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.DataInputStream;
-import java.net.URL;
-import java.net.URLConnection;
+
 
 /**
  * RuleListDialog is a dialog that displays a list of rules and allows the user to interact with them.

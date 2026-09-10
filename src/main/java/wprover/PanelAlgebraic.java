@@ -4,7 +4,6 @@ import gprover.Cons;
 import gprover.Gib;
 import gprover.GTerm;
 import maths.TMono;
-import maths.TPoly;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
@@ -12,7 +11,6 @@ import javax.swing.text.StyledDocument;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * PanelAlgebraic is an abstract class that extends JScrollPane and implements

@@ -5,8 +5,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * SelectDialog is a class that extends JBaseDialog and implements ActionListener,
@@ -24,7 +24,7 @@ public class SelectDialog extends JBaseDialog implements
     private DefaultListModel listModel;
     private static final String str = "Cancel";
     private JButton cancle_button;
-    private Vector selectedlist;
+    private List<Object> selectedlist;
     Object selected = null;
     GExpert gxInstance;
 
@@ -62,7 +62,7 @@ public class SelectDialog extends JBaseDialog implements
         getContentPane().add(panel);
 
         this.setSize(new Dimension(130, 150));
-        selectedlist = new Vector();
+        selectedlist = new ArrayList<>();
         addItem(vlist);
     }
 

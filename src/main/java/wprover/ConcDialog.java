@@ -3,8 +3,8 @@ package wprover;
 import gprover.*;
 
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -43,8 +43,8 @@ public class ConcDialog extends JBaseDialog implements ActionListener, ItemListe
     final static Font font = new Font("Dialog", Font.BOLD, 14);
     final public static int CONCLUSION_CANCEL = 1;
 
-    private Vector vlist = new Vector();
-    private Vector vlist1 = new Vector();
+    private List<Object> vlist = new ArrayList<>();
+    private List<Object> vlist1 = new ArrayList<>();
     private boolean model = true;
     private int returnValue;
     private GExpert gxInstance;

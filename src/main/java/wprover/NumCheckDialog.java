@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * NumCheckDialog is a dialog for performing numerical checks on geometric points.
