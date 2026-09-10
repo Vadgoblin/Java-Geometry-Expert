@@ -9,6 +9,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import java.awt.event.*;
 import java.awt.*;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -171,9 +172,9 @@ PPDialog extends JBaseDialog implements ActionListener, MouseMotionListener, Mou
         if (gt == null)
             return;
 
-        Vector v1 = gt.pc();
+        List<Object> v1 = gt.pc();
 
-        Vector v = gt.getAllNdgs(v1);
+        List<Object> v = gt.getAllNdgs(v1);
 
         model2.removeAllElements();
         model22.removeAllElements();
