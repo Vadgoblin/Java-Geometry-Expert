@@ -178,9 +178,9 @@ public class FactFinderDialog extends JBaseDialog implements ActionListener, Ite
             } else {
 
                 model.clear();
-                for (Object o : v) model.addElement(o);
+                for (Object o : v) model.add(0, o);
                 if (v.size() == 1) {
-                    gxInstance.getpprove().high_light_a_fact((CClass) v.getFirst());
+                    gxInstance.getpprove().high_light_a_fact((CClass) v.get(0));
                     list.setSelectedIndex(0);
                 }
             }

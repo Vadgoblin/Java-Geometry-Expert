@@ -94,7 +94,7 @@ public class PanelWu extends PanelAlgebraic implements Runnable, MouseListener {
 
         while (p1 != null) {
             TMono t = p1.poly;
-            vt.addFirst(t);
+            vt.add(0, t);
             if (t.x == m1.x)
                 break;
             p1 = p1.next;

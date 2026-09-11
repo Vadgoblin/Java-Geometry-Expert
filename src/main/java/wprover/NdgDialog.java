@@ -195,26 +195,26 @@ public class NdgDialog extends JBaseDialog implements ActionListener, MouseMotio
         model2.reset();
         model3.reset();
 
-        for (int i = 0; i < v1.size(); i++) {
-            Cons c = (Cons) v1.get(i);
+        for (Object value : v1) {
+            Cons c = (Cons) value;
             CNdg d = fd_ndg(c, v2);
             model1.addElement(c, d);
         }
 
-        for (int i = 0; i < v3.size(); i++) {
-            CNdg c = (CNdg) v3.get(i);
+        for (Object object : v3) {
+            CNdg c = (CNdg) object;
             model2.addElement(c);
         }
 
-        for (int i = 0; i < v4.size(); i++) {
-            CNdg c = (CNdg) v4.get(i);
+        for (Object o : v4) {
+            CNdg c = (CNdg) o;
             model3.addElement(c);
         }
         model3.addElement(" ");
 
         GeoPoly poly = GeoPoly.getPoly();
-        for (int i = 0; i < v4.size(); i++) {
-            CNdg c = (CNdg) v4.get(i);
+        for (Object o : v4) {
+            CNdg c = (CNdg) o;
             model3.addElement(poly.getAllPrinted(getTMono(c)));
         }
 

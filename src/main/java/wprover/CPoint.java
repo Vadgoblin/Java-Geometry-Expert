@@ -42,7 +42,7 @@ public class CPoint extends CClass {
       */
     public Constraint getConstraint() {
         if (cons.isEmpty()) return null;
-        return cons.getFirst();
+        return cons.get(0);
     }
 
      /**

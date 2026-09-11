@@ -140,7 +140,7 @@ public class JLine {
         }
 
         CPoint p1, p2;
-        p1 = vlist.getFirst();
+        p1 = vlist.get(0);
         if (p1 == null) {
             return null;
         }
@@ -162,7 +162,7 @@ public class JLine {
             return null;
         }
         if (Math.abs(p1.getx() - p2.getx()) < 0.00001) {
-            p1 = vlist.getFirst();
+            p1 = vlist.get(0);
             p2 = null;
             for (int i = 1; i < vlist.size(); i++) {
                 CPoint p = vlist.get(i);

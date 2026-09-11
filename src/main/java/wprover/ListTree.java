@@ -184,13 +184,13 @@ public class ListTree extends JTabbedPane
         List<Object> v = dp.undolist;
         undolist.addAll(v);
         for (int i = 0; i < undolist.size(); i++)
-            model.addElement(undolist.get(i));
+            model.add(0, undolist.get(i));
 
         List<Object> vx = dp.getAllSolidObj();
 
         for (Object o : vx) {
             if (o != null)
-                modelx.addElement(o);
+                modelx.add(0, o);
         }
     }
 
