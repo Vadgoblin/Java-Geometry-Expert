@@ -493,14 +493,14 @@ public class DrawBase {
 
         int st = 0;
 
-        int x, y;
+        double x, y;
         for (int i = 0; i <= nx; i++) {
             x = st + i * GridX;
-            g2.drawLine(x, 0, x, (int) Height);
+            ShapeDrawer.drawLine(g2, x, 0, x, Height);
         }
         for (int i = 0; i <= ny; i++) {
             y = st + i * GridY;
-            g2.drawLine(0, y, (int) Width, y);
+            ShapeDrawer.drawLine(g2, 0, y, Width, y);
         }
 
     }
@@ -557,17 +557,16 @@ public class DrawBase {
         drawCatchRect(g2);
 
         g2.setColor(Color.red);
-        g2.drawLine((int) (x0), (int) (y0), (int) (x2), (int) (y2));
-        g2.drawLine((int) p2.getx(), (int) p2.gety(), (int) (x2), (int) (y2));
-        g2.drawLine((int) (p1.getx()), (int) (p1.gety()), (int) (p2.getx()), (int) (p2.gety()));
+        ShapeDrawer.drawLine(g2, x0, y0, x2, y2);
+        ShapeDrawer.drawLine(g2, p2.getx(), p2.gety(), x2, y2);
+        ShapeDrawer.drawLine(g2, (p1.getx()), p1.gety(), p2.getx(), p2.gety());
         g2.setStroke(CMisc.DashedStroke);
 
         if (Math.abs(cy) < CMisc.ZERO) {
-            g2.drawLine((int) x1, 0, (int) x1, (int) this.Height);
+            ShapeDrawer.drawLine(g2, x1, 0, x1, this.Height);
         } else {
             double k = -cx / cy;
-            g2.drawLine((int) (0), (int) (y1 - x1 * k), (int) (this.Width),
-                    (int) (y1 + (this.Width - x1) * k));
+            ShapeDrawer.drawLine(g2, 0, (y1 - x1 * k), this.Width, (y1 + (this.Width - x1) * k));
         }
         catchX = x2;
         catchY = y2;
@@ -584,8 +583,8 @@ public class DrawBase {
     final public void drawCross(int x, int y, int w, Graphics2D g2) {
         g2.setColor(Color.red);
         g2.setStroke(new BasicStroke(1.0f));
-        g2.drawLine(x - w, y - w, x + w, y + w);
-        g2.drawLine(x + w, y - w, x - w, y + w);
+        ShapeDrawer.drawLine(g2, x - w, y - w, x + w, y + w);
+        ShapeDrawer.drawLine(g2, x + w, y - w, x - w, y + w);
     }
 
     /**
@@ -712,29 +711,21 @@ public class DrawBase {
         }
 
         g2.setColor(Color.red);
-        g2.drawLine((int) x0, (int) y0, (int) p2.getx(), (int) p2.gety());
+        ShapeDrawer.drawLine(g2, x0, y0, p2.getx(), p2.gety());
         if (isleft) {
             for (int i = 1; i <= n; i++) {
-                g2.drawLine((int) x0, (int) y0, (int) (x0 + i * ry),
-                        (int) (y0 - i * rx));
-                g2.drawLine((int) (x0 + i * ry), (int) (y0 - i * rx),
-                        (int) (x0 + i * ry + rx), (int) (y0 - i * rx + ry));
-                g2.drawLine((int) (x0 + rx), (int) (y0 + ry),
-                        (int) (x0 + i * ry + rx), (int) (y0 - i * rx + ry));
+                ShapeDrawer.drawLine(g2, x0, y0, (x0 + i * ry), (y0 - i * rx));
+                ShapeDrawer.drawLine(g2, (x0 + i * ry), (y0 - i * rx), (x0 + i * ry + rx), (y0 - i * rx + ry));
+                ShapeDrawer.drawLine(g2, (x0 + rx), (y0 + ry), (x0 + i * ry + rx), (y0 - i * rx + ry));
             }
-            g2.drawLine((int) (p1.getx() + r * cy), (int) (p1.gety() - r * cx),
-                    (int) (p2.getx() + r * cy), (int) (p2.gety() - r * cx));
+            ShapeDrawer.drawLine(g2, (p1.getx() + r * cy), (p1.gety() - r * cx), (p2.getx() + r * cy), (p2.gety() - r * cx));
         } else {
             for (int i = 1; i <= n; i++) {
-                g2.drawLine((int) x0, (int) y0, (int) (x0 - i * ry),
-                        (int) (y0 + i * rx));
-                g2.drawLine((int) (x0 + rx), (int) (y0 + ry),
-                        (int) (x0 + rx - i * ry), (int) (y0 + ry + i * rx));
-                g2.drawLine((int) (x0 + rx - i * ry), (int) (y0 + ry + i * rx),
-                        (int) (x0 - i * ry), (int) (y0 + i * rx));
+                ShapeDrawer.drawLine(g2, x0, y0, (x0 - i * ry), (y0 + i * rx));
+                ShapeDrawer.drawLine(g2, (x0 + rx), (y0 + ry), (x0 + rx - i * ry), (y0 + ry + i * rx));
+                ShapeDrawer.drawLine(g2, (x0 + rx - i * ry), (y0 + ry + i * rx), (x0 - i * ry), (y0 + i * rx));
             }
-            g2.drawLine((int) (p1.getx() - r * cy), (int) (p1.gety() + r * cx),
-                    (int) (p2.getx() - r * cy), (int) (p2.gety() + r * cx));
+            ShapeDrawer.drawLine(g2, (p1.getx() - r * cy), (p1.gety() + r * cx), (p2.getx() - r * cy), (p2.gety() + r * cx));
         }
     }
 
@@ -786,8 +777,8 @@ public class DrawBase {
         if (type == 0) {
             g2.setColor(Color.red);
             g2.setStroke(CMisc.NormalLineStroke);
-            g2.drawLine((int) (fx + dx), (int) (fy + dy), (int) (ex), (int) (ey));
-            g2.drawLine((int) (fx + dx1), (int) (fy + dy1), (int) (ex), (int) (ey));
+            ShapeDrawer.drawLine(g2, (fx + dx), (fy + dy), ex, (ey));
+            ShapeDrawer.drawLine(g2, (fx + dx1), (fy + dy1), ex, ey);
         } else {
             Point m1 = new Point((int) (fx + dx), (int) (fy + dy));
             Point m2 = new Point((int) (ex), (int) (ey));
@@ -822,7 +813,7 @@ public class DrawBase {
                     if (pt != null) {
                         g2.setColor(Color.red);
                         g2.setStroke(CMisc.DashedStroke);
-                        g2.drawLine((int) pt.getx(), (int) pt.gety(), (int) pt.getx(), (int) y);
+                        ShapeDrawer.drawLine(g2, pt.getx(), pt.gety(), pt.getx(), y);
                     }
                 }
                 if (CatchType == 3 || CatchType == 4) {
@@ -830,7 +821,7 @@ public class DrawBase {
                     if (pt != null) {
                         g2.setColor(Color.red);
                         g2.setStroke(CMisc.DashedStroke);
-                        g2.drawLine((int) pt.getx(), (int) pt.gety(), x, (int) pt.gety());
+                        ShapeDrawer.drawLine(g2, pt.getx(), pt.gety(), x, pt.gety());
                     }
                 }
             }
@@ -889,10 +880,10 @@ public class DrawBase {
      * @param g2 the Graphics2D context for drawing
      */
     public void drawRect(int x, int y, int x1, int y1, Graphics2D g2) {
-        g2.drawLine(x, y, x1, y);
-        g2.drawLine(x, y, x, y1);
-        g2.drawLine(x, y1, x1, y1);
-        g2.drawLine(x1, y, x1, y1);
+        ShapeDrawer.drawLine(g2, x, y, x1, y);
+        ShapeDrawer.drawLine(g2, x, y, x, y1);
+        ShapeDrawer.drawLine(g2, x, y1, x1, y1);
+        ShapeDrawer.drawLine(g2, x1, y, x1, y1);
     }
 
     /**
@@ -908,8 +899,8 @@ public class DrawBase {
      */
     public void drawcircle2p(double x1, double y1, double x2, double y2,
                              Graphics2D g2) {
-        int r = (int) Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-        g2.drawOval((int) (x1 - r), (int) (y1 - r), 2 * r, 2 * r);
+        double r = Math.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        ShapeDrawer.drawEllipse(g2, (x1 - r), (y1 - r), 2 * r, 2 * r);
     }
 
     /**
