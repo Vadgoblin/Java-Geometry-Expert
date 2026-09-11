@@ -192,7 +192,7 @@ public class CDistance extends CClass {
 
         ShapeDrawer.drawLine(g2, xx1, yy1, xx2, yy2);
         g2.setColor(Color.black);
-        g2.drawString("" + pstart.m_name + pend.m_name + " = " + ((float) ((int) (dis * 100))) / 100, (int) ((xx1 + xx2) / 2), (int) ((yy1 + yy2) / 2));
+        g2.drawString(pstart.m_name + pend.m_name + " = " + ((float) ((int) (dis * 100))) / 100, (int) ((xx1 + xx2) / 2), (int) ((yy1 + yy2) / 2));
     }
 
     /**
