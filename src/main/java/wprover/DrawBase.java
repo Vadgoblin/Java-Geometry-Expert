@@ -488,8 +488,8 @@ public class DrawBase {
         else
             g2.setColor(gridColor); //APPLET ONLY.
         //g2.setColor(CMisc.getGridColor());
-        int nx = (int) this.Width / this.GridX;
-        int ny = (int) this.Height / this.GridY;
+        double nx = this.Width / this.GridX;
+        double ny = this.Height / this.GridY;
 
         int st = 0;
 
@@ -619,12 +619,16 @@ public class DrawBase {
      */
     public void drawCatchInterCross(Graphics2D g2) {
         if (!isPointOnIntersection) return;
-        int x = (int) CatchPoint.getx();
-        int y = (int) CatchPoint.gety();
+        double x = CatchPoint.getx();
+        double y = CatchPoint.gety();
         g2.setColor(Color.red);
         this.drawCross(x, y, 5, g2);
         g2.setFont(CMisc.font);
-        g2.drawString(GExpert.getLanguage("Intersection"), x + 10, y);
+        g2.drawString(
+                GExpert.getLanguage("Intersection"),
+                (int)Math.round(x + 10),
+                (int)Math.round(y)
+        );
     }
 
     /**
@@ -710,7 +714,7 @@ public class DrawBase {
             isleft = (rx * dy - ry * dx < 0); //((ry * dx / rx - dy > 0 && ry / rx > 0) || (ry * dx / rx - dy < 0 && ry / rx < 0));
         }
 
-        int n = (int) (r / rr) + 1;
+        double n = (r / rr) + 1;
         if (Math.abs(n * rr - r) < 2 * CMisc.PIXEPS) {
             r = rr * n;
         }
@@ -841,7 +845,11 @@ public class DrawBase {
             if (!isPointOnIntersection) {
                 g2.setFont(CMisc.font);
                 g2.setColor(Color.red);
-                g2.drawString("(" + size + ") " + GExpert.getLanguage("Which?"), (int)(x + 10), (int)(y + 25));
+                g2.drawString(
+                        "(" + size + ") " + GExpert.getLanguage("Which?"),
+                        (int)Math.round(x + 10),
+                        (int)Math.round(y + 25)
+                );
             }
         }
 
