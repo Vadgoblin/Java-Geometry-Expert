@@ -580,7 +580,7 @@ public class DrawBase {
      * @param w the half-width of the cross.
      * @param g2 the Graphics2D context used for drawing.
      */
-    final public void drawCross(int x, int y, int w, Graphics2D g2) {
+    final public void drawCross(double x, double y, double w, Graphics2D g2) {
         g2.setColor(Color.red);
         g2.setStroke(new BasicStroke(1.0f));
         ShapeDrawer.drawLine(g2, x - w, y - w, x + w, y + w);
@@ -594,14 +594,19 @@ public class DrawBase {
      */
     public void drawCatchRect(Graphics2D g2) {
         if (!isPointOnObject || !mouseInside) return;
-        int x = (int) CatchPoint.getx();
-        int y = (int) CatchPoint.gety();
+        double x = CatchPoint.getx();
+        double y = CatchPoint.gety();
         g2.setColor(Color.red);
         g2.setStroke(new BasicStroke(1.0f));
         if (!isPointOnIntersection) {
             drawRect(x - 5, y - 5, x + 5, y + 5, g2);
-            if (CatchType == 1)
-                g2.drawString(GExpert.getLanguage("Middle Point"), x + 10, y);
+            if (CatchType == 1){
+                g2.drawString(
+                        GExpert.getLanguage("Middle Point"),
+                        (int)Math.round(x + 10),
+                        (int)Math.round(y)
+                );
+            }
         } else {
             drawCatchInterCross(g2);
         }
@@ -642,7 +647,7 @@ public class DrawBase {
     public void drawPointOrCross(Graphics2D g2) {
         if (this.isPointOnObject) {
             if (!isPointOnIntersection)
-                this.drawCross((int) CatchPoint.getx(), (int) CatchPoint.gety(), 5, g2);
+                this.drawCross(CatchPoint.getx(), CatchPoint.gety(), 5, g2);
             else
                 drawCatchInterCross(g2);
         } else {
@@ -802,8 +807,8 @@ public class DrawBase {
     public void drawCatch(Graphics2D g2) {
         int size = CatchList.size();
 
-        int x = (int) CatchPoint.getx();
-        int y = (int) CatchPoint.gety();
+        double x = CatchPoint.getx();
+        double y =  CatchPoint.gety();
 
         CClass cc = null;
         if (size == 0) {
@@ -836,7 +841,7 @@ public class DrawBase {
             if (!isPointOnIntersection) {
                 g2.setFont(CMisc.font);
                 g2.setColor(Color.red);
-                g2.drawString("(" + size + ") " + GExpert.getLanguage("Which?"), x + 10, y + 25);
+                g2.drawString("(" + size + ") " + GExpert.getLanguage("Which?"), (int)(x + 10), (int)(y + 25));
             }
         }
 
@@ -879,7 +884,7 @@ public class DrawBase {
      * @param y1 the y coordinate of the opposite corner
      * @param g2 the Graphics2D context for drawing
      */
-    public void drawRect(int x, int y, int x1, int y1, Graphics2D g2) {
+    public void drawRect(double x, double y, double x1, double y1, Graphics2D g2) {
         ShapeDrawer.drawLine(g2, x, y, x1, y);
         ShapeDrawer.drawLine(g2, x, y, x, y1);
         ShapeDrawer.drawLine(g2, x, y1, x1, y1);
@@ -1044,10 +1049,10 @@ public class DrawBase {
         for (int i = 0; i < textlist.size(); i++) {
             CText t = (CText) textlist.get(i);
             Dimension dm = t.getTextDimension();
-            int w = (int) dm.getWidth();
-            int h = (int) dm.getHeight();
-            int xt = t.getSX();
-            int yt = t.getSY();
+            double w = dm.getWidth();
+            double h = dm.getHeight();
+            double xt = t.getSX();
+            double yt = t.getSY();
             if (x < xt + w) {
                 x = xt + w;
             }
@@ -1069,7 +1074,9 @@ public class DrawBase {
             x = Width;
         if (y > Height)
             y = Height;
-        rc.setBounds((int) x1, (int) y1, (int) (x - x1), (int) (y - y1));
+        Rectangle rect = new Rectangle();
+        rect.setRect(x1, y1, (x - x1),(y - y1));
+        rc.setBounds(rect);
         return rc;
     }
 
