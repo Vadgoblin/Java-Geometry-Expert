@@ -13,6 +13,7 @@
  */
 
 import io.github.fvarrui.javapackager.model.FileAssociation
+import java.time.LocalDate
 
 buildscript {
     repositories {
@@ -31,7 +32,25 @@ apply plugin: 'io.github.fvarrui.javapackager.plugin'
 
 // Global settings:
 group = 'io.github.kovzol'
-ext.softwareVersion = '0.88'
+
+ext.softwareVersion = project.findProperty('softwareVersion')
+        ?: System.getenv('SOFTWARE_VERSION')
+        ?: 'undefined-version'
+
+def buildDate = LocalDate.now().toString() // e.g., "2026-10-09"
+
+processResources {
+    // Re-run if version changes
+    inputs.property('version', project.ext.softwareVersion)
+    inputs.property('buildDate', buildDate)
+
+    filesMatching('**/wprover/version.properties') {
+        expand(
+                version: project.ext.softwareVersion,
+                buildDate: buildDate
+        )
+    }
+}
 
 // These are default settings based on Gradle's standard layout:
 ext.poDir = 'src/main/po'
