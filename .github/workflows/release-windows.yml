@@ -1,20 +1,45 @@
-
-name: Build JGEX for Windows
+name: Build Windows package
 
 on:
+  release:
+    types: [published]
   workflow_dispatch:
-  push:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  windows-package:
+  build-windows:
+    name: Build Windows (amd64)
     runs-on: windows-latest
+
+    env:
+      APP_NAME: Java-Geometry-Expert
+      ARCH: amd64
 
     steps:
       - name: Check out source code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Determine version
+        id: version
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || github.ref_name }}
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+
+          if [[ -z "$VERSION" \vert{}\vert{} "$VERSION" == "refs/heads/"* ]]; then
+            VERSION="$(git describe --tags --always 2>/dev/null || echo dev)"
+            VERSION="${VERSION#v}"
+          fi
+
+          VERSION="${VERSION//_/-}"
+
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Building version: $VERSION"
 
       - name: Set up Java 17
         uses: actions/setup-java@v5
@@ -30,28 +55,82 @@ jobs:
         shell: pwsh
         run: |
           choco install gettext innosetup -y
-          refreshenv
+          
+          $gettextDir = "C:\Program Files\gettext-iconv\bin"
+          
+          if (Test-Path "$gettextDir\msgfmt.exe") {
+            Add-Content $env:GITHUB_PATH $gettextDir$env:PATH = "$gettextDir;$env:PATH"
+          } else {
+            $msgfmt = Get-ChildItem `
+              "C:\Program Files\gettext-iconv" `
+              -Filter msgfmt.exe `
+              -Recurse `
+              -ErrorAction SilentlyContinue |
+              Select-Object -First 1
+          
+            if (-not $msgfmt) {
+              throw "msgfmt.exe was not found after installing gettext."
+            }
+          
+            Add-Content $env:GITHUB_PATH$msgfmt.DirectoryName
+            $env:PATH = "$($msgfmt.DirectoryName);$env:PATH"
+          }
+          
+          if (-not (Get-Command msgfmt -ErrorAction SilentlyContinue)) {
+            throw "msgfmt is still unavailable."
+          }
+          
+          msgfmt --version
 
       - name: Verify build tools
         shell: pwsh
         run: |
           java -version
           msgfmt --version
-          iscc /?
 
-      - name: Build Windows installer
+          $iscc = Get-Command iscc -ErrorAction Stop
+          Write-Host "Inno Setup compiler found at: $($iscc.Source)"
+
+      - name: Build Windows package
         shell: pwsh
-        env:
-          SOFTWARE_VERSION: ${{ github.ref_name }}
         run: |
-          .\gradlew.bat package --no-daemon
+          .\gradlew.bat --no-daemon clean package "-PsoftwareVersion=${{ steps.version.outputs.value }}"
 
-      - name: Upload Windows installer
+      - name: Collect and normalize artifacts
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          set -euo pipefail
+
+          mkdir -p dist
+
+          shopt -s nullglob
+          exes=(build/*.exe)
+          zips=(build/*.zip)
+
+          if (( ${#exes[@]} == 1 )); then
+            cp "${exes[0]}" "dist/${APP_NAME}-${VERSION}-${ARCH}.exe"
+          fi
+
+          if (( ${#zips[@]} == 1 )); then
+            cp "${zips[0]}" "dist/${APP_NAME}-${VERSION}-${ARCH}.zip"
+          fi
+
+          ls -lh dist/
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: jgex-windows
-          path: |
-            **/*.exe
-            **/*.zip
+          name: windows-${{ env.ARCH }}
+          path: dist/*
           if-no-files-found: error
-          retention-days: 14
+
+      - name: Upload packages to GitHub Release
+        if: github.event_name == 'release'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          gh release upload "$TAG" dist/* --clobber
