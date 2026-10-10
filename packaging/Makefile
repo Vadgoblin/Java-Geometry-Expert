@@ -27,6 +27,7 @@ endif
 help:
 	@echo "Available packaging targets:"
 	@echo "  make appimage          - Build Linux AppImage"
+	@echo "  make deb-rpm           - Build Debian and RPM package"
 	@echo "  make clean-dist        - Remove dist/ directory"
 
 appimage:
@@ -41,6 +42,19 @@ appimage:
 	  -e HOST_UID="$(HOST_UID)" \
 	  -e HOST_GID="$(HOST_GID)" \
 	  $(DOCKER_UBUNTU) /build-appimage.sh
+
+deb-rpm:
+	@mkdir -p "$(OUT_DIR)"
+	docker run --rm \
+	  --platform $(DOCKER_PLATFORM) \
+	  -v "$(REPO_ROOT):/app-src:ro" \
+	  -v "$(MAKEFILE_DIR)/build-deb-rpm.sh:/build-deb-rpm.sh:ro" \
+	  -v "$(MAKEFILE_DIR)/AppRun:/AppRun:ro" \
+	  -v "$(OUT_DIR):/out" \
+	  -e APP_VERSION="$(VERSION)" \
+	  -e HOST_UID="$(HOST_UID)" \
+	  -e HOST_GID="$(HOST_GID)" \
+	  $(DOCKER_UBUNTU) /build-deb-rpm.sh
 
 clean-dist:
 	rm -rf "$(OUT_DIR)"
