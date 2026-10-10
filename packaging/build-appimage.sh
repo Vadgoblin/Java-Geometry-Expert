@@ -58,7 +58,7 @@ cp "${SRC_DIR}/build.gradle" "${JGEX_SRC_SHADOW}/"
 echo ">>> Building GCLC GUI..."
 
 cd "${JGEX_SRC_SHADOW}"
-./gradlew installDist "-PsoftwareVersion=${VERSION_STR}" -x msgFmtAll
+./gradlew installDist "-PsoftwareVersion=${VERSION_STR}"
 
 
 # ---------------------------------------------------------
