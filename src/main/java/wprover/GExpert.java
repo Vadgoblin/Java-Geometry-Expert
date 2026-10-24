@@ -1789,9 +1789,7 @@ public class GExpert extends JFrame implements ActionListener, KeyListener, Drop
             adialog.initLocation();
             adialog.setVisible(true);
         } else if (command.equals("Help")) {
-            String dr = getUserDir();
-            String sp = getFileSeparator();
-            openURL("file:///" + dr + sp + "help" + sp + "index.html");
+            HelpWindow.openHelp(this);
         } else if (command.equals("grid")) {
             dp.SetGrid(select);
             repaint();
